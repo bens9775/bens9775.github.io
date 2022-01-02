@@ -14,6 +14,9 @@ img {vertical-align: top; margin: 2px 2px 10px 5px; }
 .small {font-size: 11px; color: #333; text-align: center; }
 .medium {font-size: 14px; color: #333; text-align: left; }
 
+.myTable { width:400px;background-color:#eee;border-collapse:collapse; }
+.myTable th { background-color:#000;color:white;width:50%; }
+.myTable td, .myTable th { padding:5px;border:1px solid #000; }
 
 /* Secondary Navigation, a styled list */
 #otherstuff {margin: 0; padding: 0; clear: both; border-top: 0px white solid; list-style: none inside; }
