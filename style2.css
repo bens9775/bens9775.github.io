@@ -1,4 +1,4 @@
-body {margin: 0; padding: 0; background: #cccc99; color: #000; font: 14px Arial; color: #000; border: 0px solid #ccc; }
+body {margin: 0; padding: 0; background: #62B16E; color: #000; font: 14px Arial; color: #000; border: 0px solid #ccc; }
 
 h5 {margin: 20px 0; }
 h1 {font: 50px Arial; margin:10px; }
@@ -10,43 +10,32 @@ img {vertical-align: top; margin: 2px 2px 10px 5px; }
 
 #header {float: none; width: 756px; background: #666; margin: 10px 50px 10px 50px; padding: 0px 0px 0px 0px; text-align: center;}
 
-#content {float: none; width: auto; background: #FFC; margin: 0px 0px 0px 0px; border: 0px solid #000; line-height: 1.1; text-align: center; padding: 30px 20px 20px 20px; }
+#content {float: none; width: auto; background: #dcd4c2; margin: 0px 0px 0px 0px; border: 0px solid #000; line-height: 1.1; text-align: center; padding: 30px 20px 20px 20px; }
 .small {font-size: 11px; color: #333; text-align: center; }
 .medium {font-size: 14px; color: #333; text-align: left; }
 
-.myTable { width:400px;background-color:#eee;border-collapse:collapse; }
-.myTable th { background-color:#000;color:white;width:50%; }
+.myTable { width:400px;background-color:#eee;border-collapse:collapse;text-align:center }
+.myTable th { background-color:#000;color:white }
 .myTable td, .myTable th { padding:5px;border:1px solid #000; }
 
 /* Secondary Navigation, a styled list */
 #otherstuff {margin: 0; padding: 0; clear: both; border-top: 0px white solid; list-style: none inside; }
-#otherstuff li {width: 125px; float: left; background: #663; border: solid white; border-width: 0 0 0 1px; text-align: center; }
+#otherstuff li {width: 125px; float: left; background: #273225; border: solid white; border-width: 0 0 0 1px; text-align: center; }
 #otherstuff li:first-child {border: none; padding-left: 1px; }
-#otherstuff li a {display: block; width: 125px; padding: 3px 0; } #otherstuff li a:hover {background: #993; }
+#otherstuff li a {display: block; width: 125px; padding: 3px 0; }
+/* #otherstuff li a:hover {background: #993; } */
 
 /* Secondary Navigation, a styled list */
 #otherstuff2 {margin: 0; padding: 0; clear: both; border-top: 0px white solid; list-style: none inside; }
-#otherstuff2 li {width: 125px; float: left; background: #663; border: solid white; border-width: 0 0 0 1px; text-align: center; }
+#otherstuff2 li {width: 125px; float: left; background: #273225; border: solid white; border-width: 0 0 0 1px; text-align: center; }
 #otherstuff2 li:first-child {border: none; padding-left: 1px; }
-#otherstuff2 li a {display: block; width: 125px; padding: 3px 0; } #otherstuff li a:hover {background: #993; }
-
-#faq {float: none; width: 600px; background: #999; margin: 10px 50px 10px 50px; border: 2px solid #ccc; line-height: 1.1; text-align: left; padding: 10px 20px 20px 20px; }
-
+#otherstuff2 li a {display: block; width: 125px; padding: 3px 0; }
+/* #otherstuff li a:hover {background: #993; }*/
 #list {float: none; width: 600px; background: #FFC; margin: 10px 50px 10px 50px; border: 0px solid #ccc; line-height: 1.1; text-align: left; padding: 10px 20px 20px 20px; }
 
 .clients img {float: none; padding: 10px 30px 10px 30px; }
 .mari img {position: absolute; right: 70%; top: 320px; padding: 1px; }
 .rightside img {position: absolute; left: 70%; top: 320px;  padding: 1px; }
-
-#nav {float: none; width: 600px; border: 0px solid #ccc; background: #cccc99; margin: 10px 50px 10px 50px; line-height: 1.1; padding: 10px 20px 20px 20px; text-align: center;}
-
-#nav2 {float: none; width: 600px; border: 0px solid #ccc; background: #FFC; margin: 10px 50px 10px 50px; line-height: 1.1; padding: 10px 20px 20px 20px; text-align: center;}
-
-#cheeseimages {float: left; width: 120px; margin: 0px 10px 0px 10px; padding: 0px 0px 10px 0px; background: #FFC; color: #000;}
-
-#cheesetext {float: left; width: 420px; margin: 0px 10px 0px 10px; padding: 0px 0px 10px 0px; background: #FFC; color: #000; text-align: left; }
-
-#cheeseclass {float: none; width: auto; background: #FFC; margin: 0px 0px 0px 0px; padding: 30px 50px 50px 50px; color: #000; text-align: left; }
 
 
 /* Forms */
@@ -56,10 +45,10 @@ input.button {background: #99c; color: #fff; font: bold 1em Arial, Helvetica, sa
 
 /* Links */
 a {font-size: 14px; font-weight: bold; text-decoration: none; letter-spacing: -1px; }
-a:link {font-size: 14px; font-weight: bold; color: #960; text-decoration: none; letter-spacing: -1px; }
-a:visited {font-size: 14px; font-weight: bold; color: #660; text-decoration: none; letter-spacing: -1px; }
-a:active {font-size: 14px; font-weight: bold; color: #966; text-decoration: none; letter-spacing: -1px; }
-a:hover {font-size: 14px; font-weight: bold;color: #330; text-decoration: underline; letter-spacing: -1px; }
+a:link {font-size: 14px; font-weight: bold; color: #273225; text-decoration: none; letter-spacing: -1px; }
+a:visited {font-size: 14px; font-weight: bold; color: #273225; text-decoration: none; letter-spacing: -1px; }
+a:active {font-size: 14px; font-weight: bold; color: #273220; text-decoration: none; letter-spacing: -1px; }
+a:hover {font-size: 14px; font-weight: bold;color: #62B16E; text-decoration: underline; letter-spacing: -1px; }
 
 a.nav3:link {color: #f6f6ff; text-decoration: none; }
 a.nav3:visited {color: white; text-decoration: none; }
