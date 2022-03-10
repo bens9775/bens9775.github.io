@@ -21,7 +21,7 @@ Martin	5
 Nicholas	5
 Patrick	5
 Brendan	4
-David*	4
+David	4
 Anne	3
 Philip	2
 Bartholomew	2
