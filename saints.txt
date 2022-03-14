@@ -1,11 +1,13 @@
+All People
+Paul	27
 Andrew	26
 John	26
 Peter	24
-Luke	20
+Luke	22
 Stephen	14
 Matthew	13
 Michael	13
-Thomas	12
+Thomas	13
 Timothy	10
 James	9
 Virgin Mary	9
@@ -19,11 +21,11 @@ Matthias	6
 Jude	5
 Martin	5
 Nicholas	5
-Patrick	5
+Patrick	4
 Brendan	4
 David	4
 Anne	3
-Philip	2
+Philip the Apostle	2
 Bartholomew	2
 Simon	2
 Mary of Bethany	2
