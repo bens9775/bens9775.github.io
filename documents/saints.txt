@@ -1,0 +1,64 @@
+All People
+Paul	27
+Andrew	26
+John	26
+Peter	24
+Luke	22
+Stephen	14
+Matthew	13
+Michael	13
+Thomas	13
+Timothy	10
+James	9
+Virgin Mary	9
+George	8
+Mark	7
+Barnabas	7
+Aidan	6
+Alban	6
+Francis	6
+Matthias	6
+Jude	5
+Martin	5
+Nicholas	5
+Patrick	4
+Brendan	4
+David	4
+Anne	3
+Philip the Apostle	2
+Bartholomew	2
+Simon	2
+Mary of Bethany	2
+Augustine of Hippo	2
+Clement of Rome	2
+Anselm	2
+Columba	2
+Simeon	2
+Anna	2
+Veronica	2
+Mary Magdalene	1
+Augustine of Canterbury	1
+Clement of Alexandria	1
+Thomas of Canterbury	1
+Philip the Evangelist	1
+Ambrose	1
+Anthony	1
+Bede	1
+Benedict	1
+Chad	1
+Charles	1
+Dunstan	1
+Elizabeth	1
+Erasmus	1
+Gabriel	1
+Gregory	1
+Helena	1
+Hilda	1
+Joseph of Arimathea	1
+Laurence	1
+Lazarus	1
+Leonard	1
+Simon of Cyrene	1
+Ursula	1
+Jonah	1
+Martha	1
