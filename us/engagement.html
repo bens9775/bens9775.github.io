@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-   <meta name="Author"      content="Engagement Pictures"">
+   <meta name="Author"      content="Engagement Pictures">
  <meta name="description" content="Homepage">
   <meta name="robots"	 content="index,follow">
 	 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -14,7 +14,7 @@
 	 <meta name="theme-color" content="#ccecf7">
    <!-- Enable responsiveness on mobile devices-->
    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-
+<script src="js/nav.js"></script>
    <link rel="stylesheet" href="css/poole.css">
    <link rel="stylesheet" href="css/hyde.css">
 
@@ -22,41 +22,12 @@
 </head>
 <body class="theme-base-10 ">
 
-        <div class="sidebar">
-            <div class="container ">
-                <div>
-                    <a href="home.html">
-                        <img src="images/us_sidebar.png">
-                    </a>
-                </div>
-                <div class="sidebar-about">
-
-
-                        <p class="about lead">A website for Ben Scott and Katie Beth Dowling.</p>
-
-
-                </div>
-
-								 Pages:<br>
-								<ul class="sidebar-nav">
-									<li class="sidebar-nav-item"><a href="engagement.html">Engagement Pictures</a></li>
-										<li class="sidebar-nav-item"><a href="contact.html">Contact Us</a></li>
-									</ul>
-
-                Other Sections:<br>
-                <ul class="sidebar-nav">
-
-                      <li class="sidebar-nav-item"><a href="https://www.theknot.com/us/ben-scott-and-katie-beth-dowling-jun-2023">Wedding Website</a></li>
-											<!--
-                       <li class="sidebar-nav-item"><a href="/pie/home.html">A Pie A Week</a></li>
-										 -->
-                       <li class="sidebar-nav-item"><a href="/ben/projects.html">Ben's Projects</a></li>
-
-
-
-            </div>
-        </div>
-
+        <div class="sidebar" id="nav-placeholder"> </div>
+				<script>
+						$.get("nav.html", function(data){
+								$("#nav-placeholder").replaceWith(data);
+						});
+				</script>
 
     <div class="content container">
 
