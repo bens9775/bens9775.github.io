@@ -1,0 +1,8 @@
+@font-face {
+  font-family: Pieslices;
+  src: url(fonts/Pieslices-regular.ttf);
+}
+
+.pie-rating {
+  font-family: Pieslices;
+}
