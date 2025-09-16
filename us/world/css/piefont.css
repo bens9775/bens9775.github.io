@@ -1,0 +1,10 @@
+@font-face {
+  font-family: Pieslices;
+  src: url(Pieslices3-Regular.ttf);
+}
+
+.pie-rating {
+  font-family: Pieslices;
+  font: 50px Pieslices, brown;
+  color: brown;
+}
