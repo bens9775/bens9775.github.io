@@ -235,12 +235,20 @@
 
             function testNextImage() {
                 if (consecutiveMisses >= maxConsecutiveMisses) {
-                    // Done searching, finalize results
+                    // Done searching, randomize and finalize results
                     if (foundImages.length > 0) {
+                        // Shuffle the images randomly
+                        for (var i = foundImages.length - 1; i > 0; i--) {
+                            var j = Math.floor(Math.random() * (i + 1));
+                            var temp = foundImages[i];
+                            foundImages[i] = foundImages[j];
+                            foundImages[j] = temp;
+                        }
+                        
                         loadedImages = foundImages;
                         createImageSlides();
                         imagesLoaded = true;
-                        console.log('Found ' + foundImages.length + ' images');
+                        console.log('Found and randomized ' + foundImages.length + ' images');
                     } else {
                         showImageError();
                     }
@@ -299,6 +307,8 @@
             // Show first slide immediately
             if (totalSlides > 0) {
                 showSlide(0);
+                // Start the slideshow cycling immediately
+                setInterval(nextSlide, 10000);
             }
         }
 
@@ -541,7 +551,7 @@
             updateDateTime();
             updateWeather();
             
-            // Load images sequentially (much faster now)
+            // Load images sequentially
             loadImagesFromDirectory();
             
             // Update time every second
@@ -550,20 +560,7 @@
             // Update weather every 30 minutes
             setInterval(updateWeather, 30 * 60 * 1000);
             
-            // Start slideshow after a shorter delay
-            setTimeout(function() {
-                if (imagesLoaded && totalSlides > 0) {
-                    setInterval(nextSlide, 10000);
-                } else {
-                    // If images aren't loaded yet, check again periodically
-                    var checkInterval = setInterval(function() {
-                        if (imagesLoaded && totalSlides > 0) {
-                            setInterval(nextSlide, 10000);
-                            clearInterval(checkInterval);
-                        }
-                    }, 1000);
-                }
-            }, 1000);
+            // Slideshow interval is now started in createImageSlides()
         }
 
         // Prevent screen from sleeping (iOS specific)
