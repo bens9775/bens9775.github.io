@@ -218,10 +218,7 @@
         var WEATHER_UNITS = 'imperial';
         
         function updateWeatherOpenWeatherMap() {
-            var url = 'https://api.openweathermap.org/data/2.5/weather?q=' + 
-                      encodeURIComponent(CITY_NAME) + 
-                      '&appid=' + WEATHER_API_KEY + 
-                      '&units=' + WEATHER_UNITS;
+            var url = 'https://api.openweathermap.org/data/2.5/weather?id=4381982&appid=325a407c3c7b1194f72848d8252a2683'
             
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
