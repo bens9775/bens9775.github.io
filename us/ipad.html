@@ -176,23 +176,42 @@
 
         // Update time and date
         
-        function updateDateTime() {
+      function updateDateTime() {
             var now = new Date();
-            var timeString = now.toLocaleTimeString('en-US', {
-                hour12: true,
-                hour: '2-digit',
-                minute: '2-digit'
-                timeZoneName: 'none'
-            });
-            var dateString = now.toLocaleDateString('en-US', {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric'
-            });
             
-            document.getElementById('time').textContent = timeString;
-            document.getElementById('date').textContent = dateString;
-        }
+            // Format time manually for better iOS 9.3.5 compatibility
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
+            
+            // Pad with zeros
+            var timeString = (hours < 10 ? '0' : '') + hours + ':' +
+                           (minutes < 10 ? '0' : '') + minutes + ':' +
+                           (seconds < 10 ? '0' : '') + seconds;
+            
+            // Format date manually for better compatibility
+            var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            var months = ['January', 'February', 'March', 'April', 'May', 'June',
+                         'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            var dayName = days[now.getDay()];
+            var monthName = months[now.getMonth()];
+            var dayNum = now.getDate();
+            
+            var dateString = dayName + ', ' + monthName + ' ' + dayNum;
+            
+            // Update the DOM elements
+            var timeElement = document.getElementById('time');
+            var dateElement = document.getElementById('date');
+            
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+            if (dateElement) {
+                dateElement.textContent = dateString;
+            }
+      }
+    
  // Weather API configuration  https://openweathermap.org/api
         var WEATHER_API_KEY = '325a407c3c7b1194f72848d8252a2683';
         var CITY_NAME = 'Columbia, US'; // or use coordinates
