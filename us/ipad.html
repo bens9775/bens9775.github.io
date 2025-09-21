@@ -175,8 +175,7 @@
         var totalSlides = slides.length;
 
         // Update time and date
-        
-      function updateDateTime() {
+        function updateDateTime() {
             var now = new Date();
             
             // Format time manually for better iOS 9.3.5 compatibility
@@ -210,12 +209,12 @@
             if (dateElement) {
                 dateElement.textContent = dateString;
             }
-      }
-    
- // Weather API configuration  https://openweathermap.org/api
+        }
+
+        // Weather API configuration
         var WEATHER_API_KEY = '325a407c3c7b1194f72848d8252a2683';
-        var CITY_NAME = 'Columbia, US'; // or use coordinates
-        var WEATHER_UNITS = 'imperial'; // 'imperial' for Fahrenheit, 'metric' for Celsius
+        var CITY_NAME = 'Columbia, US';
+        var WEATHER_UNITS = 'imperial';
         
         function updateWeatherOpenWeatherMap() {
             var url = 'https://api.openweathermap.org/data/2.5/weather?q=' + 
@@ -265,6 +264,17 @@
             xhr.send();
         }
         
+        function showWeatherError() {
+            document.getElementById('temp').textContent = '--°';
+            document.getElementById('weather-desc').textContent = 'Weather unavailable';
+            document.getElementById('location').textContent = 'Check connection';
+        }
+        
+        // Main weather function
+        function updateWeather() {
+            updateWeatherOpenWeatherMap();
+        }
+        
         // Slideshow functions
         function showSlide(n) {
             // Hide all slides
@@ -283,6 +293,7 @@
             currentSlide++;
             showSlide(currentSlide);
         }
+
         // Fullscreen function for better browser support
         function requestFullscreen() {
             var elem = document.documentElement;
@@ -291,21 +302,27 @@
                 elem.requestFullscreen();
             } else if (elem.webkitRequestFullscreen) { // Safari
                 elem.webkitRequestFullscreen();
+            } else if (elem.mozRequestFullScreen) { // Firefox
+                elem.mozRequestFullScreen();
+            } else if (elem.msRequestFullscreen) { // IE/Edge
+                elem.msRequestFullscreen();
             }
+        }
+
         // Initialize and start intervals
         function init() {
             updateDateTime();
             updateWeather();
             showSlide(0);
             
-            // Update time every second
-            setInterval(updateDateTime, 10000);
+            // Update time every second (was 10000 = 10 seconds, should be 1000)
+            setInterval(updateDateTime, 1000);
             
             // Update weather every 30 minutes
             setInterval(updateWeather, 30 * 60 * 1000);
             
-            // Change slides every 10 seconds
-            setInterval(nextSlide, 20000);
+            // Change slides every 10 seconds (was 20000 = 20 seconds)
+            setInterval(nextSlide, 10000);
         }
 
         // Prevent screen from sleeping (iOS specific)
@@ -322,17 +339,7 @@
             }, 60000);
         }
 
-        // Start everything when page loads
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                init();
-                preventSleep();
-            });
-        } else {
-            init();
-            preventSleep();
-        }
-         // Try to go fullscreen on first user interaction
+        // Try to go fullscreen on first user interaction
         var hasInteracted = false;
         function handleFirstInteraction() {
             if (!hasInteracted) {
@@ -369,6 +376,27 @@
             setTimeout(function() {
                 document.body.style.minHeight = '100vh';
             }, 1000);
+        }
+
+        // Start everything when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                init();
+                preventSleep();
+                enableAddressBarHiding();
+                
+                // Add fullscreen listeners for first interaction
+                document.addEventListener('touchstart', handleFirstInteraction);
+                document.addEventListener('click', handleFirstInteraction);
+            });
+        } else {
+            init();
+            preventSleep();
+            enableAddressBarHiding();
+            
+            // Add fullscreen listeners for first interaction
+            document.addEventListener('touchstart', handleFirstInteraction);
+            document.addEventListener('click', handleFirstInteraction);
         }
 
         // Touch events to manually control slideshow (optional)
