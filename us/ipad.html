@@ -68,6 +68,60 @@
             margin-top: 3px;
         }
 
+        .hourly-forecast {
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .forecast-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 5px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE */
+        }
+
+        .forecast-scroll::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .forecast-hour {
+            flex: 0 0 auto;
+            text-align: center;
+            min-width: 60px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .forecast-hour:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .forecast-time {
+            font-size: 0.8em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .forecast-temp {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .forecast-desc {
+            font-size: 0.7em;
+            opacity: 0.7;
+            line-height: 1.2;
+        }
+
         .slideshow-container {
             flex: 1;
             position: relative;
@@ -136,6 +190,16 @@
             <div class="weather-temp" id="temp">--°</div>
             <div class="weather-desc" id="weather-desc">Loading weather...</div>
             <div class="weather-location" id="location">Your Location</div>
+        </div>
+    </div>
+
+    <div class="hourly-forecast">
+        <div class="forecast-scroll" id="hourly-forecast">
+            <div class="forecast-hour">
+                <div class="forecast-time">Loading...</div>
+                <div class="forecast-temp">--°</div>
+                <div class="forecast-desc">--</div>
+            </div>
         </div>
     </div>
 
@@ -213,16 +277,20 @@
 
         // Weather API configuration
         var WEATHER_API_KEY = '325a407c3c7b1194f72848d8252a2683';
-         //geocode for columbia mo
-        var CITY_NAME = '4381982';
+        var LAT = 38.9517;
+        var LON = -92.3341;
         var WEATHER_UNITS = 'imperial';
         
         function updateWeatherOpenWeatherMap() {
-            var url = 'https://api.openweathermap.org/data/2.5/weather?id=4381982&appid=325a407c3c7b1194f72848d8252a2683'
+            // Current weather using coordinates
+            var currentUrl = 'https://api.openweathermap.org/data/2.5/weather?lat=' + 
+                      LAT + '&lon=' + LON + 
+                      '&appid=' + WEATHER_API_KEY + 
+                      '&units=' + WEATHER_UNITS;
             
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.timeout = 10000; // 10 second timeout
+            xhr.open('GET', currentUrl, true);
+            xhr.timeout = 10000;
             
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
@@ -238,6 +306,10 @@
                             document.getElementById('weather-desc').textContent = 
                                 description.charAt(0).toUpperCase() + description.slice(1);
                             document.getElementById('location').textContent = location;
+                            
+                            // Use the same coordinates for hourly forecast
+                            updateHourlyForecast(LAT, LON);
+                            
                         } catch (e) {
                             console.error('Weather parsing error:', e);
                             showWeatherError();
@@ -262,10 +334,88 @@
             xhr.send();
         }
         
+        function updateHourlyForecast(lat, lon) {
+            var forecastUrl = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + 
+                             lat + '&lon=' + lon + 
+                             '&appid=' + WEATHER_API_KEY + 
+                             '&units=' + WEATHER_UNITS;
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', forecastUrl, true);
+            xhr.timeout = 10000;
+            
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var data = JSON.parse(xhr.responseText);
+                            displayHourlyForecast(data.list);
+                        } catch (e) {
+                            console.error('Forecast parsing error:', e);
+                            showForecastError();
+                        }
+                    } else {
+                        console.error('Forecast API error:', xhr.status);
+                        showForecastError();
+                    }
+                }
+            };
+            
+            xhr.onerror = function() {
+                console.error('Forecast network error');
+                showForecastError();
+            };
+            
+            xhr.ontimeout = function() {
+                console.error('Forecast request timeout');
+                showForecastError();
+            };
+            
+            xhr.send();
+        }
+        
+        function displayHourlyForecast(forecastList) {
+            var container = document.getElementById('hourly-forecast');
+            container.innerHTML = '';
+            
+            // Show next 12 hours (every 3 hours from API)
+            for (var i = 0; i < Math.min(12, forecastList.length); i++) {
+                var forecast = forecastList[i];
+                var date = new Date(forecast.dt * 1000);
+                
+                var hourDiv = document.createElement('div');
+                hourDiv.className = 'forecast-hour';
+                
+                // Format time
+                var hours = date.getHours();
+                var ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12; // 0 should be 12
+                var timeStr = hours + ampm;
+                
+                // Get temperature and description
+                var temp = Math.round(forecast.main.temp) + '°';
+                var desc = forecast.weather[0].main; // Short description like "Rain", "Clouds"
+                
+                hourDiv.innerHTML = 
+                    '<div class="forecast-time">' + timeStr + '</div>' +
+                    '<div class="forecast-temp">' + temp + '</div>' +
+                    '<div class="forecast-desc">' + desc + '</div>';
+                
+                container.appendChild(hourDiv);
+            }
+        }
+        
+        function showForecastError() {
+            var container = document.getElementById('hourly-forecast');
+            container.innerHTML = '<div class="forecast-hour"><div class="forecast-desc">Forecast unavailable</div></div>';
+        }
+        
         function showWeatherError() {
             document.getElementById('temp').textContent = '--°';
             document.getElementById('weather-desc').textContent = 'Weather unavailable';
             document.getElementById('location').textContent = 'Check connection';
+            showForecastError();
         }
         
         // Main weather function
