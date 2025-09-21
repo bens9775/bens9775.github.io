@@ -226,24 +226,17 @@
             img.src = url;
         }
 
-        // Function to load images with image1.jpg, image2.jpg naming pattern
+        // Function to load images sequentially starting from image1.jpg
         function loadImagesFromDirectory() {
             var foundImages = [];
-            var maxImages = 200; // Test up to 200 images
-            var testsCompleted = 0;
-            var extensions = ['jpg', 'jpeg', 'png']; // Try these extensions
+            var currentImageNum = 1;
+            var consecutiveMisses = 0;
+            var maxConsecutiveMisses = 5; // Stop after 5 consecutive misses
 
-            function checkComplete() {
-                testsCompleted++;
-                if (testsCompleted >= maxImages * extensions.length) {
+            function testNextImage() {
+                if (consecutiveMisses >= maxConsecutiveMisses) {
+                    // Done searching, finalize results
                     if (foundImages.length > 0) {
-                        // Sort images numerically
-                        foundImages.sort(function(a, b) {
-                            var numA = parseInt(a.match(/image(\d+)/)[1]);
-                            var numB = parseInt(b.match(/image(\d+)/)[1]);
-                            return numA - numB;
-                        });
-                        
                         loadedImages = foundImages;
                         createImageSlides();
                         imagesLoaded = true;
@@ -251,31 +244,39 @@
                     } else {
                         showImageError();
                     }
+                    return;
                 }
+
+                var url = IMAGE_BASE_URL + 'image' + currentImageNum + '.jpg';
+                
+                testImage(url, function(exists) {
+                    if (exists) {
+                        foundImages.push(url);
+                        consecutiveMisses = 0; // Reset miss counter
+                    } else {
+                        consecutiveMisses++;
+                    }
+                    
+                    currentImageNum++;
+                    
+                    // Continue testing with small delay
+                    setTimeout(testNextImage, 10);
+                });
             }
 
-            // Test image1.jpg, image2.jpg, etc.
-            for (var i = 1; i <= maxImages; i++) {
-                for (var e = 0; e < extensions.length; e++) {
-                    var ext = extensions[e];
-                    var url = IMAGE_BASE_URL + 'image' + i + '.' + ext;
-                    
-                    (function(testUrl) {
-                        testImage(testUrl, function(exists) {
-                            if (exists) {
-                                foundImages.push(testUrl);
-                            }
-                            checkComplete();
-                        });
-                    })(url);
-                }
-            }
+            // Start the sequential testing
+            testNextImage();
         }
 
         // Create slide elements for found images
         function createImageSlides() {
             var container = document.getElementById('slideshow-container');
             container.innerHTML = '';
+
+            if (loadedImages.length === 0) {
+                showImageError();
+                return;
+            }
 
             for (var i = 0; i < loadedImages.length; i++) {
                 var slideDiv = document.createElement('div');
@@ -294,6 +295,11 @@
             slides = document.getElementsByClassName('slide');
             totalSlides = slides.length;
             currentSlide = 0;
+            
+            // Show first slide immediately
+            if (totalSlides > 0) {
+                showSlide(0);
+            }
         }
 
         function showImageError() {
@@ -310,15 +316,20 @@
         function updateDateTime() {
             var now = new Date();
             
-            // Format time manually for better iOS 9.3.5 compatibility
+            // Format time manually for 12-hour format
             var hours = now.getHours();
             var minutes = now.getMinutes();
             var seconds = now.getSeconds();
+            var ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            // Convert to 12-hour format
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 should be 12
             
             // Pad with zeros
-            var timeString = (hours < 10 ? '0' : '') + hours + ':' +
+            var timeString = (hours < 10 ? ' ' : '') + hours + ':' +
                            (minutes < 10 ? '0' : '') + minutes + ':' +
-                           (seconds < 10 ? '0' : '') + seconds;
+                           (seconds < 10 ? '0' : '') + seconds + ' ' + ampm;
             
             // Format date manually for better compatibility
             var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -530,7 +541,7 @@
             updateDateTime();
             updateWeather();
             
-            // Load images first, then start slideshow
+            // Load images sequentially (much faster now)
             loadImagesFromDirectory();
             
             // Update time every second
@@ -539,12 +550,20 @@
             // Update weather every 30 minutes
             setInterval(updateWeather, 30 * 60 * 1000);
             
-            // Start slideshow after a delay to allow images to load
+            // Start slideshow after a shorter delay
             setTimeout(function() {
                 if (imagesLoaded && totalSlides > 0) {
                     setInterval(nextSlide, 10000);
+                } else {
+                    // If images aren't loaded yet, check again periodically
+                    var checkInterval = setInterval(function() {
+                        if (imagesLoaded && totalSlides > 0) {
+                            setInterval(nextSlide, 10000);
+                            clearInterval(checkInterval);
+                        }
+                    }, 1000);
                 }
-            }, 3000);
+            }, 1000);
         }
 
         // Prevent screen from sleeping (iOS specific)
