@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Clock and Date</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: "Outfit", sans-serif;
+            font-optical-sizing: auto;
+            font-style: normal;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .clock {
+            font-size: 15vw; /* Font size scales with viewport width */
+            margin-bottom: 0rem;
+            font-weight: 600;
+        }
+        .date {
+            font-size: 4vw; /* Font size scales with viewport width */
+            font-weight: 600;
+        }
+
+        .wlr {
+            font-family: "Outfit", sans-serif!important;
+            font-optical-sizing: auto;
+            font-style: normal;
+            font-weight: 600;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Visit This URL https://sharpweather.com/widget/r/#c=cbkg=rgb(69,90,100)&c=codd=rgb(84,110,122) and edit your Weather Widget. Else, if you don't want it, delete or comment out this weather block. -->
+
+    <!-- Weather block Starts 
+    <div id="id4167f8d5860c6" a='{"t":"r","v":"1.2","lang":"en","locs":[462],"ssot":"c","sics":"ms","cbkg":"#FFFFFF00","cfnt":"rgba(255,255,255,1)","codd":"#FFFFFF00","cont":"rgba(255,255,255,0.8313725490196079)","stof":"5"}'>Weather Data Source: <a href="https://sharpweather.com/weather_zagreb/30_days/">weather Zagreb 30 days</a></div><script async src="https://static1.sharpweather.com/widgetjs/?id=id4167f8d5860c6"></script>
+    Weather block Ends -->
+
+
+    <div class="clock" id="clock"></div>
+    <div class="date" id="date"></div>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            //// Croatian
+            const days = ['Nedjelja', 'Ponedjeljak', 'Utorak', 'Srijeda', 'Četvrtak', 'Petak', 'Subota'];
+            //// English
+            // const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            //// Spanish
+            // const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            //// French
+            // const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            //// German
+            // const days = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+            //// Italian
+            // const days = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+            //// Portuguese
+            // const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+            //// Dutch
+            // const days = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
+            //// Russian
+            // const days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+            //// Chinese (Simplified)
+            // const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            //// Japanese
+            // const days = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
+            //// Arabic
+            // const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            //// Hindi
+            // const days = ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
+            //// Greek
+            // const days = ['Κυριακή', 'Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή', 'Σάββατο'];
+            const day = days[now.getDay()];
+            const date = now.toLocaleDateString('de-DE');
+
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('date').textContent = `${day}, ${date}`;
+        }
+
+        function toggleClockMargin() {
+            const clockElement = document.querySelector('.clock');
+            if (clockElement.style.marginBottom === '4rem') {
+                clockElement.style.marginBottom = '0rem';
+            } else {
+                clockElement.style.marginBottom = '4rem';
+            }
+        }
+
+        function toggleWeatherPosition() {
+            const weatherElement = document.querySelector('.wlr');
+            if (weatherElement.style.top === '25px') {
+                weatherElement.style.top = '15px';
+            } else {
+                weatherElement.style.top = '25px';
+            }
+        }
+
+        setInterval(updateTime, 1000);
+        setInterval(toggleClockMargin, 5 * 60 * 1000); // Toggle margin every 5 minutes
+        // setInterval(toggleWeatherPosition, 5 * 60 * 1000); // Toggle margin every 5 minutes
+        updateTime(); // Initial call to display immediately
+    </script>
+</body>
+</html>
