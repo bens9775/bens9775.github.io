@@ -203,36 +203,104 @@
         </div>
     </div>
 
-    <div class="slideshow-container">
-        <!-- Sample slides with placeholder images -->
-        <div class="slide active" style="background-image: url('https://picsum.photos/800/600?random=1');">
+    <div class="slideshow-container" id="slideshow-container">
+        <!-- Images will be loaded dynamically -->
+        <div class="slide active">
             <div class="slide-overlay">
-                <div class="slide-counter">1 / 5</div>
-            </div>
-        </div>
-        <div class="slide" style="background-image: url('https://picsum.photos/800/600?random=2');">
-            <div class="slide-overlay">
-                <div class="slide-counter">2 / 5</div>
-            </div>
-        </div>
-        <div class="slide" style="background-image: url('https://picsum.photos/800/600?random=3');">
-            <div class="slide-overlay">
-                <div class="slide-counter">3 / 5</div>
-            </div>
-        </div>
-        <div class="slide" style="background-image: url('https://picsum.photos/800/600?random=4');">
-            <div class="slide-overlay">
-                <div class="slide-counter">4 / 5</div>
-            </div>
-        </div>
-        <div class="slide" style="background-image: url('https://picsum.photos/800/600?random=5');">
-            <div class="slide-overlay">
-                <div class="slide-counter">5 / 5</div>
+                <div class="slide-counter">Loading images...</div>
             </div>
         </div>
     </div>
 
     <script>
+        // Image loading configuration
+        var IMAGE_BASE_URL = 'https://benandkb.com/us/images2/';
+        var loadedImages = [];
+        var imagesLoaded = false;
+
+        // Function to test if an image exists
+        function testImage(url, callback) {
+            var img = new Image();
+            img.onload = function() { callback(true); };
+            img.onerror = function() { callback(false); };
+            img.src = url;
+        }
+
+        // Function to load images with image1.jpg, image2.jpg naming pattern
+        function loadImagesFromDirectory() {
+            var foundImages = [];
+            var maxImages = 200; // Test up to 200 images
+            var testsCompleted = 0;
+            var extensions = ['jpg', 'jpeg', 'png']; // Try these extensions
+
+            function checkComplete() {
+                testsCompleted++;
+                if (testsCompleted >= maxImages * extensions.length) {
+                    if (foundImages.length > 0) {
+                        // Sort images numerically
+                        foundImages.sort(function(a, b) {
+                            var numA = parseInt(a.match(/image(\d+)/)[1]);
+                            var numB = parseInt(b.match(/image(\d+)/)[1]);
+                            return numA - numB;
+                        });
+                        
+                        loadedImages = foundImages;
+                        createImageSlides();
+                        imagesLoaded = true;
+                        console.log('Found ' + foundImages.length + ' images');
+                    } else {
+                        showImageError();
+                    }
+                }
+            }
+
+            // Test image1.jpg, image2.jpg, etc.
+            for (var i = 1; i <= maxImages; i++) {
+                for (var e = 0; e < extensions.length; e++) {
+                    var ext = extensions[e];
+                    var url = IMAGE_BASE_URL + 'image' + i + '.' + ext;
+                    
+                    (function(testUrl) {
+                        testImage(testUrl, function(exists) {
+                            if (exists) {
+                                foundImages.push(testUrl);
+                            }
+                            checkComplete();
+                        });
+                    })(url);
+                }
+            }
+        }
+
+        // Create slide elements for found images
+        function createImageSlides() {
+            var container = document.getElementById('slideshow-container');
+            container.innerHTML = '';
+
+            for (var i = 0; i < loadedImages.length; i++) {
+                var slideDiv = document.createElement('div');
+                slideDiv.className = 'slide' + (i === 0 ? ' active' : '');
+                slideDiv.style.backgroundImage = 'url("' + loadedImages[i] + '")';
+                
+                var overlayDiv = document.createElement('div');
+                overlayDiv.className = 'slide-overlay';
+                overlayDiv.innerHTML = '<div class="slide-counter">' + (i + 1) + ' / ' + loadedImages.length + '</div>';
+                
+                slideDiv.appendChild(overlayDiv);
+                container.appendChild(slideDiv);
+            }
+
+            // Update global variables
+            slides = document.getElementsByClassName('slide');
+            totalSlides = slides.length;
+            currentSlide = 0;
+        }
+
+        function showImageError() {
+            var container = document.getElementById('slideshow-container');
+            container.innerHTML = '<div class="slide active"><div class="slide-overlay"><div class="slide-counter">No images found. Expected: image1.jpg, image2.jpg, etc.</div></div></div>';
+        }
+
         // Variables
         var currentSlide = 0;
         var slides = document.getElementsByClassName('slide');
@@ -461,16 +529,22 @@
         function init() {
             updateDateTime();
             updateWeather();
-            showSlide(0);
             
-            // Update time every second (was 10000 = 10 seconds, should be 1000)
+            // Load images first, then start slideshow
+            loadImagesFromDirectory();
+            
+            // Update time every second
             setInterval(updateDateTime, 1000);
             
             // Update weather every 30 minutes
             setInterval(updateWeather, 30 * 60 * 1000);
             
-            // Change slides every 10 seconds (was 20000 = 20 seconds)
-            setInterval(nextSlide, 10000);
+            // Start slideshow after a delay to allow images to load
+            setTimeout(function() {
+                if (imagesLoaded && totalSlides > 0) {
+                    setInterval(nextSlide, 10000);
+                }
+            }, 3000);
         }
 
         // Prevent screen from sleeping (iOS specific)
