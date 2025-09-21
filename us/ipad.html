@@ -181,12 +181,10 @@
             var timeString = now.toLocaleTimeString('en-US', {
                 hour12: true,
                 hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
+                minute: '2-digit'
             });
             var dateString = now.toLocaleDateString('en-US', {
                 weekday: 'long',
-                year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
@@ -273,13 +271,13 @@
             showSlide(0);
             
             // Update time every second
-            setInterval(updateDateTime, 1000);
+            setInterval(updateDateTime, 10000);
             
             // Update weather every 30 minutes
             setInterval(updateWeather, 30 * 60 * 1000);
             
             // Change slides every 10 seconds
-            setInterval(nextSlide, 10000);
+            setInterval(nextSlide, 20000);
         }
 
         // Prevent screen from sleeping (iOS specific)
