@@ -218,11 +218,26 @@
         var loadedImages = [];
         var imagesLoaded = false;
 
-        // Function to test if an image exists
+        // Function to test if an image exists (iOS 9.3.5 compatible)
         function testImage(url, callback) {
             var img = new Image();
-            img.onload = function() { callback(true); };
-            img.onerror = function() { callback(false); };
+            var timeout;
+            
+            img.onload = function() {
+                if (timeout) clearTimeout(timeout);
+                callback(true);
+            };
+            
+            img.onerror = function() {
+                if (timeout) clearTimeout(timeout);
+                callback(false);
+            };
+            
+            // Add timeout for iOS 9.3.5 compatibility
+            timeout = setTimeout(function() {
+                callback(false);
+            }, 3000);
+            
             img.src = url;
         }
 
@@ -256,8 +271,11 @@
                 }
 
                 var url = IMAGE_BASE_URL + 'image' + currentImageNum + '.jpg';
+                console.log('Testing image: ' + url); // Debug log for iPad
                 
                 testImage(url, function(exists) {
+                    console.log('Image ' + currentImageNum + ' exists: ' + exists); // Debug log
+                    
                     if (exists) {
                         foundImages.push(url);
                         consecutiveMisses = 0; // Reset miss counter
@@ -267,8 +285,8 @@
                     
                     currentImageNum++;
                     
-                    // Continue testing with small delay
-                    setTimeout(testNextImage, 10);
+                    // Continue testing with longer delay for iOS 9.3.5
+                    setTimeout(testNextImage, 50);
                 });
             }
 
@@ -467,31 +485,87 @@
             var container = document.getElementById('hourly-forecast');
             container.innerHTML = '';
             
-            // Show next 12 hours (every 3 hours from API)
-            for (var i = 0; i < Math.min(12, forecastList.length); i++) {
-                var forecast = forecastList[i];
-                var date = new Date(forecast.dt * 1000);
+            var now = new Date();
+            var currentHour = now.getHours();
+            
+            // Create 12 consecutive hours starting from current hour
+            for (var i = 0; i < 12; i++) {
+                var targetHour = (currentHour + i) % 24;
+                var targetDate = new Date(now);
+                targetDate.setHours(targetHour, 0, 0, 0);
+                
+                // If we've wrapped to next day, add a day
+                if (targetHour < currentHour) {
+                    targetDate.setDate(targetDate.getDate() + 1);
+                }
+                
+                // Find closest forecast data for this hour
+                var closestForecast = findClosestForecast(forecastList, targetDate);
                 
                 var hourDiv = document.createElement('div');
                 hourDiv.className = 'forecast-hour';
                 
-                // Format time
-                var hours = date.getHours();
-                var ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12;
-                hours = hours ? hours : 12; // 0 should be 12
-                var timeStr = hours + ampm;
+                // Format time for display
+                var displayHour = targetHour % 12;
+                displayHour = displayHour ? displayHour : 12; // 0 should be 12
+                var ampm = targetHour >= 12 ? 'PM' : 'AM';
+                var timeStr = displayHour + ampm;
                 
-                // Get temperature and description
-                var temp = Math.round(forecast.main.temp) + '°';
-                var desc = forecast.weather[0].main; // Short description like "Rain", "Clouds"
+                var temp = '--°';
+                var weatherEmoji = '❓';
+                
+                if (closestForecast) {
+                    temp = Math.round(closestForecast.main.temp) + '°';
+                    weatherEmoji = getWeatherEmoji(closestForecast.weather[0].main);
+                }
                 
                 hourDiv.innerHTML = 
                     '<div class="forecast-time">' + timeStr + '</div>' +
                     '<div class="forecast-temp">' + temp + '</div>' +
-                    '<div class="forecast-desc">' + desc + '</div>';
+                    '<div class="forecast-desc">' + weatherEmoji + '</div>';
                 
                 container.appendChild(hourDiv);
+            }
+        }
+        
+        function findClosestForecast(forecastList, targetDate) {
+            var targetTime = targetDate.getTime();
+            var closest = null;
+            var closestDiff = Infinity;
+            
+            for (var i = 0; i < forecastList.length; i++) {
+                var forecastTime = forecastList[i].dt * 1000;
+                var diff = Math.abs(targetTime - forecastTime);
+                
+                if (diff < closestDiff) {
+                    closestDiff = diff;
+                    closest = forecastList[i];
+                }
+            }
+            
+            return closest;
+        }
+        
+        function getWeatherEmoji(condition) {
+            // Use simple emojis that work on iOS 9.3.5
+            switch (condition.toLowerCase()) {
+                case 'clear':
+                    return '☀️';
+                case 'clouds':
+                    return '☁️';
+                case 'rain':
+                    return '🌧️';
+                case 'drizzle':
+                    return '🌦️';
+                case 'thunderstorm':
+                    return '⛈️';
+                case 'snow':
+                    return '❄️';
+                case 'mist':
+                case 'fog':
+                    return '🌫️';
+                default:
+                    return '🌤️';
             }
         }
         
