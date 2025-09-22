@@ -218,27 +218,71 @@
         var loadedImages = [];
         var imagesLoaded = false;
 
-        // Function to test if an image exists (iOS 9.3.5 compatible)
+        // Function to test if an image exists (iOS 9.3.5 compatible with XMLHttpRequest fallback)
         function testImage(url, callback) {
+            // Try Image method first
             var img = new Image();
-            var timeout;
+            var imageTimeout;
+            var imageMethod = true;
             
             img.onload = function() {
-                if (timeout) clearTimeout(timeout);
-                callback(true);
+                if (imageTimeout) clearTimeout(imageTimeout);
+                if (imageMethod) {
+                    imageMethod = false;
+                    callback(true);
+                }
             };
             
             img.onerror = function() {
-                if (timeout) clearTimeout(timeout);
-                callback(false);
+                if (imageTimeout) clearTimeout(imageTimeout);
+                if (imageMethod) {
+                    imageMethod = false;
+                    // Try XMLHttpRequest method as fallback
+                    tryXHRMethod();
+                }
             };
             
-            // Add timeout for iOS 9.3.5 compatibility
-            timeout = setTimeout(function() {
-                callback(false);
-            }, 3000);
+            // Set timeout for Image method
+            imageTimeout = setTimeout(function() {
+                if (imageMethod) {
+                    imageMethod = false;
+                    // Try XMLHttpRequest method as fallback
+                    tryXHRMethod();
+                }
+            }, 2000);
             
             img.src = url;
+            
+            function tryXHRMethod() {
+                var xhr = new XMLHttpRequest();
+                xhr.open('HEAD', url, true);
+                xhr.timeout = 5000;
+                
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        // Check if status is 200 (OK) or 0 (local/some mobile browsers)
+                        if (xhr.status === 200 || (xhr.status === 0 && xhr.responseText !== undefined)) {
+                            callback(true);
+                        } else {
+                            callback(false);
+                        }
+                    }
+                };
+                
+                xhr.onerror = function() {
+                    callback(false);
+                };
+                
+                xhr.ontimeout = function() {
+                    callback(false);
+                };
+                
+                try {
+                    xhr.send();
+                } catch (e) {
+                    callback(false);
+                }
+            }
         }
 
         // Function to load images sequentially starting from image1.jpg
@@ -246,11 +290,16 @@
             var foundImages = [];
             var currentImageNum = 1;
             var consecutiveMisses = 0;
-            var maxConsecutiveMisses = 5; // Stop after 5 consecutive misses
+            var maxConsecutiveMisses = 3; // Reduced for iPad
+            var maxImageNum = 50; // Don't test beyond 50 images
+
+            console.log('Starting image discovery on iPad...');
 
             function testNextImage() {
-                if (consecutiveMisses >= maxConsecutiveMisses) {
-                    // Done searching, randomize and finalize results
+                // Stop if too many consecutive misses or reached max
+                if (consecutiveMisses >= maxConsecutiveMisses || currentImageNum > maxImageNum) {
+                    console.log('Stopping search. Found ' + foundImages.length + ' images');
+                    
                     if (foundImages.length > 0) {
                         // Shuffle the images randomly
                         for (var i = foundImages.length - 1; i > 0; i--) {
@@ -263,35 +312,40 @@
                         loadedImages = foundImages;
                         createImageSlides();
                         imagesLoaded = true;
-                        console.log('Found and randomized ' + foundImages.length + ' images');
+                        console.log('iPad: Found and randomized ' + foundImages.length + ' images');
                     } else {
+                        console.log('iPad: No images found');
                         showImageError();
                     }
                     return;
                 }
 
                 var url = IMAGE_BASE_URL + 'image' + currentImageNum + '.jpg';
-                console.log('Testing image: ' + url); // Debug log for iPad
+                console.log('iPad testing: ' + url);
                 
                 testImage(url, function(exists) {
-                    console.log('Image ' + currentImageNum + ' exists: ' + exists); // Debug log
+                    console.log('iPad result for image' + currentImageNum + '.jpg: ' + exists);
                     
                     if (exists) {
                         foundImages.push(url);
                         consecutiveMisses = 0; // Reset miss counter
+                        console.log('iPad: Added image' + currentImageNum + '.jpg to slideshow');
                     } else {
                         consecutiveMisses++;
+                        console.log('iPad: Miss #' + consecutiveMisses + ' for image' + currentImageNum);
                     }
                     
                     currentImageNum++;
                     
-                    // Continue testing with longer delay for iOS 9.3.5
-                    setTimeout(testNextImage, 50);
+                    // Longer delay for iPad stability
+                    setTimeout(testNextImage, 200);
                 });
             }
 
-            // Start the sequential testing
-            testNextImage();
+            // Start with a delay to ensure page is ready
+            setTimeout(function() {
+                testNextImage();
+            }, 1000);
         }
 
         // Create slide elements for found images
