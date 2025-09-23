@@ -18,18 +18,33 @@
 	 <script src="/us/js/nav.js"></script>
 	   <link rel="stylesheet" href="/us/css/poole.css">
 	   <link rel="stylesheet" href="/us/css/hyde.css">
-		 	 <link rel="stylesheet" href="/us/pie/css/piefont.css">
+		 	 <link rel="stylesheet" href="/us/world/css/piefont.css">
 	<title>Kitchen Table World Tour</title>
 </head>
 <body class="theme-base-10 ">
 
         <div class="sidebar" id="nav-placeholder"> </div>
+				//mine
+				<!--
 				<script>
-						$.get("pienav.html", function(data){
+						$.get("worldnav.html", function(data){
 								$("#nav-placeholder").replaceWith(data);
 						});
 				</script>
-
+			-->
+				// from claude
+				<script>
+				document.addEventListener('DOMContentLoaded', function() {
+					fetch('worldnav.html')
+						.then(response => response.text())
+						.then(data => {
+							document.getElementById('nav-placeholder').innerHTML = data;
+						})
+						.catch(error => {
+							console.error('Error loading navigation:', error);
+						});
+				});
+			</script>
     <div class="content container">
 
 
