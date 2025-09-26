@@ -52,18 +52,18 @@
         }
 
         .weather-temp {
-            font-size: 2.5em;
+            font-size: 5em;
             font-weight: 300;
         }
 
         .weather-desc {
-            font-size: 1em;
+            font-size: 2em;
             opacity: 0.9;
             margin-top: 5px;
         }
 
         .weather-location {
-            font-size: 0.9em;
+            font-size: 1.8em;
             opacity: 0.7;
             margin-top: 3px;
         }
@@ -187,7 +187,7 @@
             }
             
             .weather-temp {
-                font-size: 2em;
+                font-size: 4em;
             }
             
             .slideshow-container {
@@ -220,16 +220,19 @@
         </div>
     </div>
 
-    <div class="slideshow-container" id="slideshow-container">
-        <!-- Images will be loaded dynamically -->
+    <div class="slideshow-container">
+        <!-- Simple single image test for iPad -->
         <div class="slide active">
+            <img id="test-image" src="https://benandkb.com/us/images2/image1.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover;">
             <div class="slide-overlay">
-                <div class="slide-counter">Loading images...</div>
+                <div class="slide-counter">Testing image1.jpg</div>
             </div>
         </div>
     </div>
 
     <script>
+        // COMMENTED OUT: Image loading functionality for testing
+        /*
         // Image loading configuration
         var IMAGE_BASE_URL = 'https://benandkb.com/us/images2/';
         var loadedImages = [];
@@ -237,218 +240,45 @@
 
         // Function to test if an image exists (iOS 9.3.5 compatible with XMLHttpRequest fallback)
         function testImage(url, callback) {
-            // Try Image method first
-            var img = new Image();
-            var imageTimeout;
-            var imageMethod = true;
-            
-            img.onload = function() {
-                if (imageTimeout) clearTimeout(imageTimeout);
-                if (imageMethod) {
-                    imageMethod = false;
-                    callback(true);
-                }
-            };
-            
-            img.onerror = function() {
-                if (imageTimeout) clearTimeout(imageTimeout);
-                if (imageMethod) {
-                    imageMethod = false;
-                    // Try XMLHttpRequest method as fallback
-                    tryXHRMethod();
-                }
-            };
-            
-            // Set timeout for Image method
-            imageTimeout = setTimeout(function() {
-                if (imageMethod) {
-                    imageMethod = false;
-                    // Try XMLHttpRequest method as fallback
-                    tryXHRMethod();
-                }
-            }, 2000);
-            
-            img.src = url;
-            
-            function tryXHRMethod() {
-                var xhr = new XMLHttpRequest();
-                xhr.open('HEAD', url, true);
-                xhr.timeout = 5000;
-                
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === 4) {
-                        // Check if status is 200 (OK) or 0 (local/some mobile browsers)
-                        if (xhr.status === 200 || (xhr.status === 0 && xhr.responseText !== undefined)) {
-                            callback(true);
-                        } else {
-                            callback(false);
-                        }
-                    }
-                };
-                
-                xhr.onerror = function() {
-                    callback(false);
-                };
-                
-                xhr.ontimeout = function() {
-                    callback(false);
-                };
-                
-                try {
-                    xhr.send();
-                } catch (e) {
-                    callback(false);
-                }
-            }
+            // ... (commented out for testing)
         }
 
         // Function to load images sequentially starting from image1.jpg
         function loadImagesFromDirectory() {
-            var foundImages = [];
-            var currentImageNum = 1;
-            var consecutiveMisses = 0;
-            var maxConsecutiveMisses = 3; // Reduced for iPad
-            var maxImageNum = 50; // Don't test beyond 50 images
-
-            console.log('Starting image discovery on iPad...');
-
-            function testNextImage() {
-                // Stop if too many consecutive misses or reached max
-                if (consecutiveMisses >= maxConsecutiveMisses || currentImageNum > maxImageNum) {
-                    console.log('Stopping search. Found ' + foundImages.length + ' images');
-                    
-                    if (foundImages.length > 0) {
-                        // Shuffle the images randomly
-                        for (var i = foundImages.length - 1; i > 0; i--) {
-                            var j = Math.floor(Math.random() * (i + 1));
-                            var temp = foundImages[i];
-                            foundImages[i] = foundImages[j];
-                            foundImages[j] = temp;
-                        }
-                        
-                        loadedImages = foundImages;
-                        createImageSlides();
-                        imagesLoaded = true;
-                        console.log('iPad: Found and randomized ' + foundImages.length + ' images');
-                    } else {
-                        console.log('iPad: No images found');
-                        showImageError();
-                    }
-                    return;
-                }
-
-                var url = IMAGE_BASE_URL + 'image' + currentImageNum + '.jpg';
-                console.log('iPad testing: ' + url);
-                
-                testImage(url, function(exists) {
-                    console.log('iPad result for image' + currentImageNum + '.jpg: ' + exists);
-                    
-                    if (exists) {
-                        foundImages.push(url);
-                        consecutiveMisses = 0; // Reset miss counter
-                        console.log('iPad: Added image' + currentImageNum + '.jpg to slideshow');
-                    } else {
-                        consecutiveMisses++;
-                        console.log('iPad: Miss #' + consecutiveMisses + ' for image' + currentImageNum);
-                    }
-                    
-                    currentImageNum++;
-                    
-                    // Longer delay for iPad stability
-                    setTimeout(testNextImage, 200);
-                });
-            }
-
-            // Start with a delay to ensure page is ready
-            setTimeout(function() {
-                testNextImage();
-            }, 1000);
+            // ... (commented out for testing)
         }
 
         // Create slide elements for found images
         function createImageSlides() {
-            var container = document.getElementById('slideshow-container');
-            container.innerHTML = '';
-
-            if (loadedImages.length === 0) {
-                showImageError();
-                return;
-            }
-
-            for (var i = 0; i < loadedImages.length; i++) {
-                var slideDiv = document.createElement('div');
-                slideDiv.className = 'slide' + (i === 0 ? ' active' : '');
-                
-                // Try img element first, fallback to background-image if it fails
-                var imgElement = document.createElement('img');
-                imgElement.src = loadedImages[i];
-                imgElement.alt = ''; // Remove alt text to avoid showing "Photo X"
-                
-                // Add crossOrigin attribute for better compatibility
-                imgElement.crossOrigin = 'anonymous';
-                
-                // Store the slide div and image URL for fallback
-                var imageUrl = loadedImages[i];
-                var currentSlide = slideDiv;
-                
-                imgElement.onerror = function() {
-                    console.log('IMG failed, trying background-image fallback: ' + imageUrl);
-                    // Remove the img element
-                    if (this.parentNode) {
-                        this.parentNode.removeChild(this);
-                    }
-                    // Use background-image as fallback
-                    currentSlide.style.backgroundImage = 'url("' + imageUrl + '")';
-                    currentSlide.style.backgroundSize = 'cover';
-                    currentSlide.style.backgroundPosition = 'center';
-                    currentSlide.style.backgroundRepeat = 'no-repeat';
-                };
-                
-                imgElement.onload = function() {
-                    console.log('IMG successfully loaded: ' + this.src);
-                };
-                
-                // Add a timeout fallback
-                setTimeout(function() {
-                    if (imgElement.complete === false || imgElement.naturalHeight === 0) {
-                        console.log('IMG timeout, using background fallback: ' + imageUrl);
-                        if (imgElement.parentNode) {
-                            imgElement.parentNode.removeChild(imgElement);
-                        }
-                        currentSlide.style.backgroundImage = 'url("' + imageUrl + '")';
-                        currentSlide.style.backgroundSize = 'cover';
-                        currentSlide.style.backgroundPosition = 'center';
-                        currentSlide.style.backgroundRepeat = 'no-repeat';
-                    }
-                }, 3000);
-                
-                slideDiv.appendChild(imgElement);
-                
-                var overlayDiv = document.createElement('div');
-                overlayDiv.className = 'slide-overlay';
-                overlayDiv.innerHTML = '<div class="slide-counter">' + (i + 1) + ' / ' + loadedImages.length + '</div>';
-                
-                slideDiv.appendChild(overlayDiv);
-                container.appendChild(slideDiv);
-            }
-
-            // Update global variables
-            slides = document.getElementsByClassName('slide');
-            totalSlides = slides.length;
-            currentSlide = 0;
-            
-            // Show first slide immediately
-            if (totalSlides > 0) {
-                showSlide(0);
-                // Start the slideshow cycling immediately
-                setInterval(nextSlide, 10000);
-                console.log('iPad: Slideshow started with ' + totalSlides + ' images');
-            }
+            // ... (commented out for testing)
         }
 
         function showImageError() {
-            var container = document.getElementById('slideshow-container');
-            container.innerHTML = '<div class="slide active"><div class="slide-overlay"><div class="slide-counter">No images found. Expected: image1.jpg, image2.jpg, etc.</div></div></div>';
+            // ... (commented out for testing)
+        }
+        */
+
+        // Simple image test for iPad
+        function testSingleImage() {
+            var img = document.getElementById('test-image');
+            if (img) {
+                img.onload = function() {
+                    console.log('SUCCESS: image1.jpg loaded on iPad!');
+                    document.querySelector('.slide-counter').textContent = 'image1.jpg loaded successfully!';
+                };
+                
+                img.onerror = function() {
+                    console.log('ERROR: image1.jpg failed to load on iPad');
+                    document.querySelector('.slide-counter').textContent = 'image1.jpg failed to load';
+                    
+                    // Try background-image fallback
+                    var slide = document.querySelector('.slide');
+                    slide.style.backgroundImage = 'url("https://benandkb.com/us/images2/image1.jpg")';
+                    slide.style.backgroundSize = 'cover';
+                    slide.style.backgroundPosition = 'center';
+                    slide.innerHTML = '<div class="slide-overlay"><div class="slide-counter">Trying background-image fallback</div></div>';
+                };
+            }
         }
 
         // Variables
