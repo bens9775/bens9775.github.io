@@ -189,6 +189,7 @@
             
             .time {
                 font-size: 5.6em;
+                font-weight: 700;
             }
             
             .date {
@@ -442,6 +443,20 @@
             var currentHour = now.getHours();
             var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             
+            // Get sunrise/sunset times (we'll get these from the current weather API call)
+            var sunriseTime = null;
+            var sunsetTime = null;
+            
+            // We need to get this from the weather API - for now we'll set placeholders
+            // This will be populated when weather data loads
+            if (window.currentWeatherData) {
+                sunriseTime = new Date(window.currentWeatherData.sys.sunrise * 1000);
+                sunsetTime = new Date(window.currentWeatherData.sys.sunset * 1000);
+            }
+            
+            var sunriseAdded = false;
+            var sunsetAdded = false;
+            
             // Create 24 consecutive hours starting from current hour
             for (var i = 0; i < 24; i++) {
                 var targetHour = (currentHour + i) % 24;
@@ -451,6 +466,20 @@
                 // If we've wrapped to next day, add a day
                 if (targetHour < currentHour) {
                     targetDate.setDate(targetDate.getDate() + 1);
+                }
+                
+                // Check if we should add sunrise before this hour
+                if (sunriseTime && !sunriseAdded && targetDate > sunriseTime) {
+                    var sunriseDiv = createSunriseDiv(sunriseTime);
+                    container.appendChild(sunriseDiv);
+                    sunriseAdded = true;
+                }
+                
+                // Check if we should add sunset before this hour
+                if (sunsetTime && !sunsetAdded && targetDate > sunsetTime) {
+                    var sunsetDiv = createSunsetDiv(sunsetTime);
+                    container.appendChild(sunsetDiv);
+                    sunsetAdded = true;
                 }
                 
                 // Determine the label for this hour
@@ -484,6 +513,52 @@
                 
                 container.appendChild(hourDiv);
             }
+            
+            // Add remaining sunrise/sunset if not added yet
+            if (sunriseTime && !sunriseAdded) {
+                var sunriseDiv = createSunriseDiv(sunriseTime);
+                container.appendChild(sunriseDiv);
+            }
+            if (sunsetTime && !sunsetAdded) {
+                var sunsetDiv = createSunsetDiv(sunsetTime);
+                container.appendChild(sunsetDiv);
+            }
+        }
+        
+        function createSunriseDiv(sunriseTime) {
+            var hourDiv = document.createElement('div');
+            hourDiv.className = 'forecast-hour sunrise-sunset';
+            
+            var hours = sunriseTime.getHours();
+            var minutes = sunriseTime.getMinutes();
+            var ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            var timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes + ampm;
+            
+            hourDiv.innerHTML = 
+                '<div class="forecast-time sunrise-sunset-label">Sunrise</div>' +
+                '<div class="forecast-temp sunrise-sunset-time">' + timeStr + '</div>';
+            
+            return hourDiv;
+        }
+        
+        function createSunsetDiv(sunsetTime) {
+            var hourDiv = document.createElement('div');
+            hourDiv.className = 'forecast-hour sunrise-sunset';
+            
+            var hours = sunsetTime.getHours();
+            var minutes = sunsetTime.getMinutes();
+            var ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            var timeStr = hours + ':' + (minutes < 10 ? '0' : '') + minutes + ampm;
+            
+            hourDiv.innerHTML = 
+                '<div class="forecast-time sunrise-sunset-label">Sunset</div>' +
+                '<div class="forecast-temp sunrise-sunset-time">' + timeStr + '</div>';
+            
+            return hourDiv;
         }
         
         function getDayLabel(targetDate, today) {
