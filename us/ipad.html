@@ -135,13 +135,26 @@
             display: none;
             width: 100%;
             height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            position: relative;
         }
 
         .slide.active {
             display: block;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* Fallback for older browsers that don't support object-fit */
+        @supports not (object-fit: cover) {
+            .slide img {
+                width: 100%;
+                height: 100%;
+            }
         }
 
         .slide-overlay {
@@ -361,7 +374,22 @@
             for (var i = 0; i < loadedImages.length; i++) {
                 var slideDiv = document.createElement('div');
                 slideDiv.className = 'slide' + (i === 0 ? ' active' : '');
-                slideDiv.style.backgroundImage = 'url("' + loadedImages[i] + '")';
+                
+                // Create img element instead of using background-image
+                var imgElement = document.createElement('img');
+                imgElement.src = loadedImages[i];
+                imgElement.alt = 'Photo ' + (i + 1);
+                
+                // Add error handling for individual images
+                imgElement.onerror = function() {
+                    console.log('Failed to load image: ' + this.src);
+                };
+                
+                imgElement.onload = function() {
+                    console.log('Successfully loaded image: ' + this.src);
+                };
+                
+                slideDiv.appendChild(imgElement);
                 
                 var overlayDiv = document.createElement('div');
                 overlayDiv.className = 'slide-overlay';
@@ -381,6 +409,7 @@
                 showSlide(0);
                 // Start the slideshow cycling immediately
                 setInterval(nextSlide, 10000);
+                console.log('iPad: Slideshow started with ' + totalSlides + ' images');
             }
         }
 
