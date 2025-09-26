@@ -36,7 +36,7 @@
 
         .time {
             font-size: 7em;
-            font-weight: 200;
+            font-weight: 700;
             letter-spacing: 2px;
         }
 
@@ -120,6 +120,15 @@
             font-size: 1.4em;
             opacity: 0.7;
             line-height: 1.2;
+            margin-bottom: 5px;
+        }
+
+        .forecast-label {
+            font-size: 0.9em;
+            opacity: 0.6;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .slideshow-container {
@@ -290,20 +299,18 @@
         function updateDateTime() {
             var now = new Date();
             
-            // Format time manually for 12-hour format
+            // Format time manually for 12-hour format WITHOUT seconds
             var hours = now.getHours();
             var minutes = now.getMinutes();
-            var seconds = now.getSeconds();
             var ampm = hours >= 12 ? 'PM' : 'AM';
             
             // Convert to 12-hour format
             hours = hours % 12;
             hours = hours ? hours : 12; // 0 should be 12
             
-            // Pad with zeros
+            // Pad minutes with zeros, no seconds
             var timeString = (hours < 10 ? ' ' : '') + hours + ':' +
-                           (minutes < 10 ? '0' : '') + minutes + ':' +
-                           (seconds < 10 ? '0' : '') + seconds + ' ' + ampm;
+                           (minutes < 10 ? '0' : '') + minutes + ' ' + ampm;
             
             // Format date manually for better compatibility
             var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -433,6 +440,7 @@
             
             var now = new Date();
             var currentHour = now.getHours();
+            var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             
             // Create 24 consecutive hours starting from current hour
             for (var i = 0; i < 24; i++) {
@@ -444,6 +452,9 @@
                 if (targetHour < currentHour) {
                     targetDate.setDate(targetDate.getDate() + 1);
                 }
+                
+                // Determine the label for this hour
+                var label = getDayLabel(targetDate, today);
                 
                 // Find closest forecast data for this hour
                 var closestForecast = findClosestForecast(forecastList, targetDate);
@@ -468,9 +479,35 @@
                 hourDiv.innerHTML = 
                     '<div class="forecast-time">' + timeStr + '</div>' +
                     '<div class="forecast-temp">' + temp + '</div>' +
-                    '<div class="forecast-desc">' + weatherEmoji + '</div>';
+                    '<div class="forecast-desc">' + weatherEmoji + '</div>' +
+                    '<div class="forecast-label">' + label + '</div>';
                 
                 container.appendChild(hourDiv);
+            }
+        }
+        
+        function getDayLabel(targetDate, today) {
+            var targetDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+            var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+            var targetHour = targetDate.getHours();
+            
+            if (targetDay.getTime() === today.getTime()) {
+                // Same day
+                if (targetHour <= 20) { // 8PM and earlier
+                    return 'Today';
+                } else { // 9PM and later
+                    return 'Tonight';
+                }
+            } else if (targetDay.getTime() === tomorrow.getTime()) {
+                // Next day
+                if (targetHour <= 4) { // 12AM to 4AM
+                    return 'Tonight';
+                } else { // 5AM and later
+                    return 'Tomorrow';
+                }
+            } else {
+                // Day after tomorrow or later
+                return 'Tomorrow';
             }
         }
         
@@ -571,8 +608,8 @@
             updateDateTime();
             updateWeather();
             
-            // Load images sequentially
-            loadImagesFromDirectory();
+            // Test single image instead of loading multiple
+            testSingleImage();
             
             // Update time every second
             setInterval(updateDateTime, 1000);
@@ -580,7 +617,7 @@
             // Update weather every 30 minutes
             setInterval(updateWeather, 30 * 60 * 1000);
             
-            // Slideshow interval is now started in createImageSlides()
+            // No slideshow for now - just testing one image
         }
 
         // Prevent screen from sleeping (iOS specific)
