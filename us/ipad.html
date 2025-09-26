@@ -31,7 +31,6 @@
             align-items: center;
             padding: 20px 30px;
             background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
         }
 
         .datetime {
@@ -77,9 +76,19 @@
             padding: 22px 30px;
             background: rgba(0, 0, 0, 0.15);
             border-radius: 15px;
-            backdrop-filter: blur(5px);
         }
+.forecast-scroll {
+    /* ... (keep existing properties) */
+    gap: 22px; /* <-- REMOVE THIS LINE, or keep it for modern browsers */
+}
 
+/* Add compatible spacing for old browsers */
+.forecast-hour {
+    margin-right: 22px;
+}
+.forecast-hour:last-child {
+    margin-right: 0;
+}
         .forecast-scroll {
             display: flex;
             overflow-x: auto;
@@ -176,6 +185,20 @@
             font-size: 0.9em;
             opacity: 0.8;
         }
+        .slide {
+    display: none;
+    width: 100%;
+    height: 100%; /* <-- KEEP THIS! */
+    position: relative;
+    /* ADD these two lines to ensure background image displays correctly */
+    background-repeat: no-repeat;
+    background-size: cover; 
+}
+.slide.active {
+    display: block;
+    /* Ensure height is correct for the active slide */
+    height: 100%; 
+}
 
         /* Responsive adjustments for iPad Mini */
         @media screen and (max-width: 1024px) {
@@ -262,27 +285,34 @@
         */
 
         // Simple image test for iPad
-        function testSingleImage() {
-            var img = document.getElementById('test-image');
-            if (img) {
-                img.onload = function() {
-                    console.log('SUCCESS: image1.jpg loaded on iPad!');
-                    document.querySelector('.slide-counter').textContent = 'image1.jpg loaded successfully!';
-                };
-                
-                img.onerror = function() {
-                    console.log('ERROR: image1.jpg failed to load on iPad');
-                    document.querySelector('.slide-counter').textContent = 'image1.jpg failed to load';
-                    
-                    // Try background-image fallback
-                    var slide = document.querySelector('.slide');
-                    slide.style.backgroundImage = 'url("https://benandkb.com/us/images2/image1.jpg")';
-                    slide.style.backgroundSize = 'cover';
-                    slide.style.backgroundPosition = 'center';
-                    slide.innerHTML = '<div class="slide-overlay"><div class="slide-counter">Trying background-image fallback</div></div>';
-                };
-            }
-        }
+   <!-- old version--
+            function testSingleImage() {
+    var imageUrl = 'https://benandkb.com/us/images2/image1.jpg';
+    var slide = document.getElementById('image-slide-0'); // The div with the ID
+    var counter = document.getElementById('slide-counter-0');
+
+    if (slide) {
+        // Unconditionally set the background image (the most compatible display method)
+        slide.style.backgroundImage = 'url("' + imageUrl + '")';
+        slide.style.backgroundSize = 'cover';
+        slide.style.backgroundPosition = 'center';
+
+        // Still create a temporary image object to test *loading* status
+        var tempImg = new Image();
+        tempImg.onload = function() {
+            console.log('SUCCESS: image1.jpg loaded and set as background.');
+            counter.textContent = 'Image loaded successfully via background-image!';
+        };
+
+        tempImg.onerror = function() {
+            console.log('ERROR: image1.jpg failed to load (TLS/Network issue likely)');
+            counter.textContent = 'Image FAILED to load (Network/TLS error)';
+        };
+
+        // Start the loading attempt
+        tempImg.src = imageUrl;
+    }
+}
 
         // Variables
         var currentSlide = 0;
@@ -347,6 +377,8 @@
             xhr.timeout = 10000;
             
             xhr.onreadystatechange = function() {
+                window.currentWeatherData = data; 
+                updateHourlyForecast(LAT, LON); 
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         try {
@@ -783,6 +815,8 @@
                 }
             }
         });
+       
+        
     </script>
 </body>
 </html>
