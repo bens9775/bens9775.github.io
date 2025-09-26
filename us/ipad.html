@@ -35,13 +35,13 @@
         }
 
         .time {
-            font-size: 3.5em;
+            font-size: 7em;
             font-weight: 200;
             letter-spacing: 2px;
         }
 
         .date {
-            font-size: 1.2em;
+            font-size: 2.4em;
             opacity: 0.9;
             margin-top: 5px;
         }
@@ -70,17 +70,17 @@
 
         .hourly-forecast {
             margin-top: 20px;
-            padding: 15px 20px;
+            padding: 22px 30px;
             background: rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
+            border-radius: 15px;
             backdrop-filter: blur(5px);
         }
 
         .forecast-scroll {
             display: flex;
             overflow-x: auto;
-            gap: 15px;
-            padding: 5px;
+            gap: 22px;
+            padding: 7px;
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE */
         }
@@ -92,10 +92,10 @@
         .forecast-hour {
             flex: 0 0 auto;
             text-align: center;
-            min-width: 60px;
-            padding: 8px;
+            min-width: 90px;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            border-radius: 12px;
             transition: background 0.3s ease;
         }
 
@@ -104,20 +104,20 @@
         }
 
         .forecast-time {
-            font-size: 0.8em;
+            font-size: 1.2em;
             opacity: 0.8;
-            margin-bottom: 5px;
+            margin-bottom: 7px;
         }
 
         .forecast-temp {
-            font-size: 1.1em;
+            font-size: 1.65em;
             font-weight: 500;
             color: #fff;
-            margin-bottom: 5px;
+            margin-bottom: 7px;
         }
 
         .forecast-desc {
-            font-size: 0.7em;
+            font-size: 1.4em;
             opacity: 0.7;
             line-height: 1.2;
         }
@@ -179,7 +179,11 @@
             }
             
             .time {
-                font-size: 2.8em;
+                font-size: 5.6em;
+            }
+            
+            .date {
+                font-size: 1.8em;
             }
             
             .weather-temp {
@@ -375,19 +379,48 @@
                 var slideDiv = document.createElement('div');
                 slideDiv.className = 'slide' + (i === 0 ? ' active' : '');
                 
-                // Create img element instead of using background-image
+                // Try img element first, fallback to background-image if it fails
                 var imgElement = document.createElement('img');
                 imgElement.src = loadedImages[i];
-                imgElement.alt = 'Photo ' + (i + 1);
+                imgElement.alt = ''; // Remove alt text to avoid showing "Photo X"
                 
-                // Add error handling for individual images
+                // Add crossOrigin attribute for better compatibility
+                imgElement.crossOrigin = 'anonymous';
+                
+                // Store the slide div and image URL for fallback
+                var imageUrl = loadedImages[i];
+                var currentSlide = slideDiv;
+                
                 imgElement.onerror = function() {
-                    console.log('Failed to load image: ' + this.src);
+                    console.log('IMG failed, trying background-image fallback: ' + imageUrl);
+                    // Remove the img element
+                    if (this.parentNode) {
+                        this.parentNode.removeChild(this);
+                    }
+                    // Use background-image as fallback
+                    currentSlide.style.backgroundImage = 'url("' + imageUrl + '")';
+                    currentSlide.style.backgroundSize = 'cover';
+                    currentSlide.style.backgroundPosition = 'center';
+                    currentSlide.style.backgroundRepeat = 'no-repeat';
                 };
                 
                 imgElement.onload = function() {
-                    console.log('Successfully loaded image: ' + this.src);
+                    console.log('IMG successfully loaded: ' + this.src);
                 };
+                
+                // Add a timeout fallback
+                setTimeout(function() {
+                    if (imgElement.complete === false || imgElement.naturalHeight === 0) {
+                        console.log('IMG timeout, using background fallback: ' + imageUrl);
+                        if (imgElement.parentNode) {
+                            imgElement.parentNode.removeChild(imgElement);
+                        }
+                        currentSlide.style.backgroundImage = 'url("' + imageUrl + '")';
+                        currentSlide.style.backgroundSize = 'cover';
+                        currentSlide.style.backgroundPosition = 'center';
+                        currentSlide.style.backgroundRepeat = 'no-repeat';
+                    }
+                }, 3000);
                 
                 slideDiv.appendChild(imgElement);
                 
@@ -571,8 +604,8 @@
             var now = new Date();
             var currentHour = now.getHours();
             
-            // Create 12 consecutive hours starting from current hour
-            for (var i = 0; i < 12; i++) {
+            // Create 24 consecutive hours starting from current hour
+            for (var i = 0; i < 24; i++) {
                 var targetHour = (currentHour + i) % 24;
                 var targetDate = new Date(now);
                 targetDate.setHours(targetHour, 0, 0, 0);
