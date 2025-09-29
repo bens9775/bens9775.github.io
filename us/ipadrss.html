@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wall Display</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .slide img {
+        width: 100%;
+        height: auto; /* fallback */
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .datetime {
+            text-align: center;
+        }
+
+        .time {
+            font-size: 7em;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .date {
+            font-size: 2.4em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .weather {
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .weather-temp {
+            font-size: 5em;
+            font-weight: 300;
+        }
+
+        .weather-desc {
+            font-size: 2em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .weather-location {
+            font-size: 1.8em;
+            opacity: 0.7;
+            margin-top: 3px;
+        }
+
+        .hourly-forecast {
+            margin-top: 20px;
+            padding: 22px 30px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 15px;
+        }
+.forecast-scroll {
+    /* ... (keep existing properties) */
+    gap: 22px; /* <-- REMOVE THIS LINE, or keep it for modern browsers */
+}
+
+/* Add compatible spacing for old browsers */
+.forecast-hour {
+    margin-right: 22px;
+}
+.forecast-hour:last-child {
+    margin-right: 0;
+}
+        .forecast-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 22px;
+            padding: 7px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE */
+        }
+
+        .forecast-scroll::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .forecast-hour {
+            flex: 0 0 auto;
+            text-align: center;
+            min-width: 90px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .forecast-hour:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .forecast-time {
+            font-size: 1.2em;
+            opacity: 0.8;
+            margin-bottom: 7px;
+        }
+
+        .forecast-temp {
+            font-size: 1.65em;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 7px;
+        }
+
+        .forecast-desc {
+            font-size: 1.4em;
+            opacity: 0.7;
+            line-height: 1.2;
+            margin-bottom: 5px;
+        }
+
+        .forecast-label {
+            font-size: 0.9em;
+            opacity: 0.6;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .slideshow-container {
+            flex: 1;
+            position: relative;
+            margin: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+        }
+
+
+
+        .slide-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            padding: 20px;
+            text-align: center;
+        }
+
+        .slide-counter {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        .slide {
+    display: none;
+    width: 100%;
+    height: 100%; /* <-- KEEP THIS! */
+    position: relative;
+    /* ADD these two lines to ensure background image displays correctly */
+    background-repeat: no-repeat;
+    background-size: cover; 
+}
+.slide.active {
+    display: block;
+    /* Ensure height is correct for the active slide */
+    height: 100%; 
+}
+
+        /* Responsive adjustments for iPad Mini */
+        @media screen and (max-width: 1024px) {
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .time {
+                font-size: 5.6em;
+                font-weight: 700;
+            }
+            
+            .date {
+                font-size: 1.8em;
+            }
+            
+            .weather-temp {
+                font-size: 4em;
+            }
+            
+            .slideshow-container {
+                margin: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="datetime">
+            <div class="time" id="time">00:00:00</div>
+            <div class="date" id="date">Loading...</div>
+        </div>
+        <!--
+        <div class="weather">
+            <div class="weather-temp" id="temp">--°</div>
+            <div class="weather-desc" id="weather-desc">Loading weather...</div>
+            <div class="weather-location" id="location">Your Location</div>
+        </div>
+    -->
+    </div>
+<!--
+        <div class="hourly-forecast">
+        <div class="forecast-scroll" id="hourly-forecast">
+            <div class="forecast-hour">
+                <div class="forecast-time">Loading...</div>
+                <div class="forecast-temp">--°</div>
+                <div class="forecast-desc">--</div>
+            </div>
+        </div>
+    </div>
+-->
+<div class="slideshow-container">
+    <div class="slide active" id="image-slide-0">
+        <div class="slide-overlay">
+            <div class="slide-counter" id="slide-counter-0">Testing image1.jpg</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
