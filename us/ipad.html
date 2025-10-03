@@ -20,10 +20,6 @@
             display: flex;
             flex-direction: column;
         }
-        .slide img {
-        width: 100%;
-        height: auto; /* fallback */
-        }
 
         .header {
             display: flex;
@@ -31,6 +27,7 @@
             align-items: center;
             padding: 20px 30px;
             background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         .datetime {
@@ -76,19 +73,9 @@
             padding: 22px 30px;
             background: rgba(0, 0, 0, 0.15);
             border-radius: 15px;
+            backdrop-filter: blur(5px);
         }
-.forecast-scroll {
-    /* ... (keep existing properties) */
-    gap: 22px; /* <-- REMOVE THIS LINE, or keep it for modern browsers */
-}
 
-/* Add compatible spacing for old browsers */
-.forecast-hour {
-    margin-right: 22px;
-}
-.forecast-hour:last-child {
-    margin-right: 0;
-}
         .forecast-scroll {
             display: flex;
             overflow-x: auto;
@@ -144,6 +131,23 @@
             letter-spacing: 0.5px;
         }
 
+        .sunrise-sunset {
+            background: rgba(255, 193, 7, 0.15);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .sunrise-sunset-label {
+            font-size: 1.0em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .sunrise-sunset-time {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #fff;
+        }
+
         .slideshow-container {
             flex: 1;
             position: relative;
@@ -167,9 +171,17 @@
         .slide img {
             width: 100%;
             height: 100%;
+            object-fit: cover;
+            object-position: center;
         }
 
-
+        /* Fallback for older browsers that don't support object-fit */
+        @supports not (object-fit: cover) {
+            .slide img {
+                width: 100%;
+                height: 100%;
+            }
+        }
 
         .slide-overlay {
             position: absolute;
@@ -185,20 +197,6 @@
             font-size: 0.9em;
             opacity: 0.8;
         }
-        .slide {
-    display: none;
-    width: 100%;
-    height: 100%; /* <-- KEEP THIS! */
-    position: relative;
-    /* ADD these two lines to ensure background image displays correctly */
-    background-repeat: no-repeat;
-    background-size: cover; 
-}
-.slide.active {
-    display: block;
-    /* Ensure height is correct for the active slide */
-    height: 100%; 
-}
 
         /* Responsive adjustments for iPad Mini */
         @media screen and (max-width: 1024px) {
@@ -249,13 +247,16 @@
         </div>
     </div>
 
-<div class="slideshow-container">
-    <div class="slide active" id="image-slide-0">
-        <div class="slide-overlay">
-            <div class="slide-counter" id="slide-counter-0">Testing image1.jpg</div>
+    <div class="slideshow-container">
+        <!-- Simple single image test for iPad -->
+        <div class="slide active">
+            <img id="test-image" src="https://benandkb.com/us/images2/image1.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+            <div class="slide-overlay">
+                <div class="slide-counter">Testing image1.jpg</div>
+            </div>
         </div>
     </div>
-</div>
+
     <script>
         // COMMENTED OUT: Image loading functionality for testing
         /*
@@ -285,34 +286,27 @@
         */
 
         // Simple image test for iPad
-   <!-- old version--
-            function testSingleImage() {
-    var imageUrl = 'https://benandkb.com/us/images2/image1.jpg';
-    var slide = document.getElementById('image-slide-0'); // The div with the ID
-    var counter = document.getElementById('slide-counter-0');
-
-    if (slide) {
-        // Unconditionally set the background image (the most compatible display method)
-        slide.style.backgroundImage = 'url("' + imageUrl + '")';
-        slide.style.backgroundSize = 'cover';
-        slide.style.backgroundPosition = 'center';
-
-        // Still create a temporary image object to test *loading* status
-        var tempImg = new Image();
-        tempImg.onload = function() {
-            console.log('SUCCESS: image1.jpg loaded and set as background.');
-            counter.textContent = 'Image loaded successfully via background-image!';
-        };
-
-        tempImg.onerror = function() {
-            console.log('ERROR: image1.jpg failed to load (TLS/Network issue likely)');
-            counter.textContent = 'Image FAILED to load (Network/TLS error)';
-        };
-
-        // Start the loading attempt
-        tempImg.src = imageUrl;
-    }
-}
+        function testSingleImage() {
+            var img = document.getElementById('test-image');
+            if (img) {
+                img.onload = function() {
+                    console.log('SUCCESS: image1.jpg loaded on iPad!');
+                    document.querySelector('.slide-counter').textContent = 'image1.jpg loaded successfully!';
+                };
+                
+                img.onerror = function() {
+                    console.log('ERROR: image1.jpg failed to load on iPad');
+                    document.querySelector('.slide-counter').textContent = 'image1.jpg failed to load';
+                    
+                    // Try background-image fallback
+                    var slide = document.querySelector('.slide');
+                    slide.style.backgroundImage = 'url("https://benandkb.com/us/images2/image1.jpg")';
+                    slide.style.backgroundSize = 'cover';
+                    slide.style.backgroundPosition = 'center';
+                    slide.innerHTML = '<div class="slide-overlay"><div class="slide-counter">Trying background-image fallback</div></div>';
+                };
+            }
+        }
 
         // Variables
         var currentSlide = 0;
@@ -377,8 +371,6 @@
             xhr.timeout = 10000;
             
             xhr.onreadystatechange = function() {
-                window.currentWeatherData = data; 
-                updateHourlyForecast(LAT, LON); 
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         try {
@@ -393,8 +385,13 @@
                                 description.charAt(0).toUpperCase() + description.slice(1);
                             document.getElementById('location').textContent = location;
                             
-                            // Use the same coordinates for hourly forecast
-                            updateHourlyForecast(LAT, LON);
+                            // Store weather data globally for sunrise/sunset
+                            window.currentWeatherData = data;
+                            
+                            // Get coordinates for hourly forecast
+                            var lat = LAT;
+                            var lon = LON;
+                            updateHourlyForecast(lat, lon);
                             
                         } catch (e) {
                             console.error('Weather parsing error:', e);
@@ -468,15 +465,17 @@
             var currentHour = now.getHours();
             var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             
-            // Get sunrise/sunset times (we'll get these from the current weather API call)
+            // Get sunrise/sunset times from stored weather data
             var sunriseTime = null;
             var sunsetTime = null;
             
-            // We need to get this from the weather API - for now we'll set placeholders
-            // This will be populated when weather data loads
-            if (window.currentWeatherData) {
+            if (window.currentWeatherData && window.currentWeatherData.sys) {
                 sunriseTime = new Date(window.currentWeatherData.sys.sunrise * 1000);
                 sunsetTime = new Date(window.currentWeatherData.sys.sunset * 1000);
+                console.log('Sunrise: ' + sunriseTime);
+                console.log('Sunset: ' + sunsetTime);
+            } else {
+                console.log('No sunrise/sunset data available yet');
             }
             
             var sunriseAdded = false;
@@ -494,17 +493,22 @@
                 }
                 
                 // Check if we should add sunrise before this hour
-                if (sunriseTime && !sunriseAdded && targetDate > sunriseTime) {
-                    var sunriseDiv = createSunriseDiv(sunriseTime);
-                    container.appendChild(sunriseDiv);
-                    sunriseAdded = true;
+                if (sunriseTime && !sunriseAdded) {
+                    var nextHourDate = new Date(targetDate);
+                    nextHourDate.setHours(targetDate.getHours() + 1);
+                    
+                    if (sunriseTime >= targetDate && sunriseTime < nextHourDate) {
+                        var sunriseDiv = createSunriseDiv(sunriseTime);
+                        container.appendChild(sunriseDiv);
+                        sunriseAdded = true;
+                        console.log('Added sunrise box at ' + sunriseTime);
+                    }
                 }
                 
-                // Check if we should add sunset before this hour
-                if (sunsetTime && !sunsetAdded && targetDate > sunsetTime) {
-                    var sunsetDiv = createSunsetDiv(sunsetTime);
-                    container.appendChild(sunsetDiv);
-                    sunsetAdded = true;
+                // Determine if it's nighttime (between sunset and sunrise)
+                var isNighttime = false;
+                if (sunriseTime && sunsetTime) {
+                    isNighttime = targetDate < sunriseTime || targetDate >= sunsetTime;
                 }
                 
                 // Determine the label for this hour
@@ -527,7 +531,7 @@
                 
                 if (closestForecast) {
                     temp = Math.round(closestForecast.main.temp) + '°';
-                    weatherEmoji = getWeatherEmoji(closestForecast.weather[0].main);
+                    weatherEmoji = getWeatherEmoji(closestForecast.weather[0].main, isNighttime);
                 }
                 
                 hourDiv.innerHTML = 
@@ -537,16 +541,19 @@
                     '<div class="forecast-label">' + label + '</div>';
                 
                 container.appendChild(hourDiv);
-            }
-            
-            // Add remaining sunrise/sunset if not added yet
-            if (sunriseTime && !sunriseAdded) {
-                var sunriseDiv = createSunriseDiv(sunriseTime);
-                container.appendChild(sunriseDiv);
-            }
-            if (sunsetTime && !sunsetAdded) {
-                var sunsetDiv = createSunsetDiv(sunsetTime);
-                container.appendChild(sunsetDiv);
+                
+                // Check if we should add sunset after this hour
+                if (sunsetTime && !sunsetAdded) {
+                    var nextHourDate2 = new Date(targetDate);
+                    nextHourDate2.setHours(targetDate.getHours() + 1);
+                    
+                    if (sunsetTime >= targetDate && sunsetTime < nextHourDate2) {
+                        var sunsetDiv = createSunsetDiv(sunsetTime);
+                        container.appendChild(sunsetDiv);
+                        sunsetAdded = true;
+                        console.log('Added sunset box at ' + sunsetTime);
+                    }
+                }
             }
         }
         
@@ -629,7 +636,12 @@
             return closest;
         }
         
-        function getWeatherEmoji(condition) {
+        function getWeatherEmoji(condition, isNighttime) {
+            // Use moon for clear weather during nighttime
+            if (isNighttime && condition.toLowerCase() === 'clear') {
+                return '🌙';
+            }
+            
             // Use simple emojis that work on iOS 9.3.5
             switch (condition.toLowerCase()) {
                 case 'clear':
@@ -815,8 +827,6 @@
                 }
             }
         });
-       
-        
     </script>
 </body>
 </html>
