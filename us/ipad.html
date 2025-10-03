@@ -472,11 +472,17 @@
             if (window.currentWeatherData && window.currentWeatherData.sys) {
                 sunriseTime = new Date(window.currentWeatherData.sys.sunrise * 1000);
                 sunsetTime = new Date(window.currentWeatherData.sys.sunset * 1000);
-                console.log('Sunrise: ' + sunriseTime);
-                console.log('Sunset: ' + sunsetTime);
+                console.log('Sunrise timestamp: ' + window.currentWeatherData.sys.sunrise);
+                console.log('Sunset timestamp: ' + window.currentWeatherData.sys.sunset);
+                console.log('Sunrise time: ' + sunriseTime.toLocaleString());
+                console.log('Sunset time: ' + sunsetTime.toLocaleString());
+                console.log('Current time: ' + now.toLocaleString());
             } else {
                 console.log('No sunrise/sunset data available yet');
             }
+            
+            var sunriseAdded = false;
+            var sunsetAdded = false;
             
             // Create 24 consecutive hours starting from current hour
             for (var i = 0; i < 24; i++) {
@@ -493,10 +499,13 @@
                 nextHourDate.setHours(targetDate.getHours() + 1);
                 
                 // Check if sunrise falls in this hour window
-                if (sunriseTime && sunriseTime >= targetDate && sunriseTime < nextHourDate) {
-                    var sunriseDiv = createSunriseDiv(sunriseTime);
-                    container.appendChild(sunriseDiv);
-                    console.log('Added sunrise box at ' + sunriseTime);
+                if (sunriseTime && !sunriseAdded) {
+                    if (sunriseTime >= targetDate && sunriseTime < nextHourDate) {
+                        console.log('ADDING SUNRISE: between ' + targetDate.toLocaleString() + ' and ' + nextHourDate.toLocaleString());
+                        var sunriseDiv = createSunriseDiv(sunriseTime);
+                        container.appendChild(sunriseDiv);
+                        sunriseAdded = true;
+                    }
                 }
                 
                 // Determine if it's nighttime (between sunset and sunrise)
@@ -537,11 +546,22 @@
                 container.appendChild(hourDiv);
                 
                 // Check if sunset falls in this hour window
-                if (sunsetTime && sunsetTime >= targetDate && sunsetTime < nextHourDate) {
-                    var sunsetDiv = createSunsetDiv(sunsetTime);
-                    container.appendChild(sunsetDiv);
-                    console.log('Added sunset box at ' + sunsetTime);
+                if (sunsetTime && !sunsetAdded) {
+                    if (sunsetTime >= targetDate && sunsetTime < nextHourDate) {
+                        console.log('ADDING SUNSET: between ' + targetDate.toLocaleString() + ' and ' + nextHourDate.toLocaleString());
+                        var sunsetDiv = createSunsetDiv(sunsetTime);
+                        container.appendChild(sunsetDiv);
+                        sunsetAdded = true;
+                    }
                 }
+            }
+            
+            // Debug: Check if we missed adding them
+            if (sunriseTime && !sunriseAdded) {
+                console.log('WARNING: Sunrise was never added! Time: ' + sunriseTime.toLocaleString());
+            }
+            if (sunsetTime && !sunsetAdded) {
+                console.log('WARNING: Sunset was never added! Time: ' + sunsetTime.toLocaleString());
             }
         }
         
