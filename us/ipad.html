@@ -171,16 +171,7 @@
         .slide img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        /* Fallback for older browsers that don't support object-fit */
-        @supports not (object-fit: cover) {
-            .slide img {
-                width: 100%;
-                height: 100%;
-            }
+            display: block;
         }
 
         .slide-overlay {
@@ -248,11 +239,11 @@
     </div>
 
     <div class="slideshow-container">
-        <!-- Simple single image test for iPad -->
+        <!-- Ultra-simple single image for iPad compatibility -->
         <div class="slide active">
-            <img id="test-image" src="https://benandkb.com/us/images2/image1.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+            <img src="https://benandkb.com/us/images2/image1.jpg" alt="" width="100%" height="100%">
             <div class="slide-overlay">
-                <div class="slide-counter">Testing image1.jpg</div>
+                <div class="slide-counter">1 / 1</div>
             </div>
         </div>
     </div>
@@ -432,6 +423,12 @@
                     if (xhr.status === 200) {
                         try {
                             var data = JSON.parse(xhr.responseText);
+                            console.log('Forecast API returned ' + data.list.length + ' data points');
+                            // Log first few forecast times and temps for debugging
+                            for (var i = 0; i < Math.min(5, data.list.length); i++) {
+                                var dt = new Date(data.list[i].dt * 1000);
+                                console.log('Forecast ' + i + ': ' + dt.toLocaleString() + ' = ' + Math.round(data.list[i].main.temp) + '°F');
+                            }
                             displayHourlyForecast(data.list);
                         } catch (e) {
                             console.error('Forecast parsing error:', e);
@@ -462,7 +459,6 @@
             container.innerHTML = '';
             
             var now = new Date();
-            var currentHour = now.getHours();
             var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             
             // Get sunrise/sunset times from stored weather data
@@ -472,70 +468,51 @@
             if (window.currentWeatherData && window.currentWeatherData.sys) {
                 sunriseTime = new Date(window.currentWeatherData.sys.sunrise * 1000);
                 sunsetTime = new Date(window.currentWeatherData.sys.sunset * 1000);
-                console.log('Sunrise timestamp: ' + window.currentWeatherData.sys.sunrise);
-                console.log('Sunset timestamp: ' + window.currentWeatherData.sys.sunset);
                 console.log('Sunrise time: ' + sunriseTime.toLocaleString());
                 console.log('Sunset time: ' + sunsetTime.toLocaleString());
-                console.log('Current time: ' + now.toLocaleString());
-            } else {
-                console.log('No sunrise/sunset data available yet');
             }
             
             var sunriseAdded = false;
             var sunsetAdded = false;
+            var lastForecastTime = null;
             
-            // Create 24 consecutive hours starting from current hour
-            for (var i = 0; i < 24; i++) {
-                var targetHour = (currentHour + i) % 24;
-                var targetDate = new Date(now);
-                targetDate.setHours(targetHour, 0, 0, 0);
+            // Loop through actual forecast data points from API
+            for (var i = 0; i < forecastList.length; i++) {
+                var forecast = forecastList[i];
+                var forecastDate = new Date(forecast.dt * 1000);
                 
-                // If we've wrapped to next day, add a day
-                if (targetHour < currentHour) {
-                    targetDate.setDate(targetDate.getDate() + 1);
-                }
-                
-                var nextHourDate = new Date(targetDate);
-                nextHourDate.setHours(targetDate.getHours() + 1);
-                
-                // Check if sunrise falls in this hour window
+                // Add sunrise if it falls between last forecast and this one
                 if (sunriseTime && !sunriseAdded) {
-                    if (sunriseTime >= targetDate && sunriseTime < nextHourDate) {
-                        console.log('ADDING SUNRISE: between ' + targetDate.toLocaleString() + ' and ' + nextHourDate.toLocaleString());
+                    if ((lastForecastTime === null && sunriseTime < forecastDate) || 
+                        (lastForecastTime && sunriseTime >= lastForecastTime && sunriseTime < forecastDate)) {
                         var sunriseDiv = createSunriseDiv(sunriseTime);
                         container.appendChild(sunriseDiv);
                         sunriseAdded = true;
+                        console.log('Added sunrise box');
                     }
                 }
                 
-                // Determine if it's nighttime (between sunset and sunrise)
+                // Determine if it's nighttime
                 var isNighttime = false;
                 if (sunriseTime && sunsetTime) {
-                    isNighttime = targetDate < sunriseTime || targetDate >= sunsetTime;
+                    isNighttime = forecastDate < sunriseTime || forecastDate >= sunsetTime;
                 }
                 
-                // Determine the label for this hour
-                var label = getDayLabel(targetDate, today);
-                
-                // Find closest forecast data for this hour
-                var closestForecast = findClosestForecast(forecastList, targetDate);
+                // Determine the label for this forecast
+                var label = getDayLabel(forecastDate, today);
                 
                 var hourDiv = document.createElement('div');
                 hourDiv.className = 'forecast-hour';
                 
                 // Format time for display
-                var displayHour = targetHour % 12;
-                displayHour = displayHour ? displayHour : 12; // 0 should be 12
-                var ampm = targetHour >= 12 ? 'PM' : 'AM';
+                var hours = forecastDate.getHours();
+                var displayHour = hours % 12;
+                displayHour = displayHour ? displayHour : 12;
+                var ampm = hours >= 12 ? 'PM' : 'AM';
                 var timeStr = displayHour + ampm;
                 
-                var temp = '--°';
-                var weatherEmoji = '❓';
-                
-                if (closestForecast) {
-                    temp = Math.round(closestForecast.main.temp) + '°';
-                    weatherEmoji = getWeatherEmoji(closestForecast.weather[0].main, isNighttime);
-                }
+                var temp = Math.round(forecast.main.temp) + '°';
+                var weatherEmoji = getWeatherEmoji(forecast.weather[0].main, isNighttime);
                 
                 hourDiv.innerHTML = 
                     '<div class="forecast-time">' + timeStr + '</div>' +
@@ -545,23 +522,38 @@
                 
                 container.appendChild(hourDiv);
                 
-                // Check if sunset falls in this hour window
+                // Add sunset if it falls between this forecast and next one
                 if (sunsetTime && !sunsetAdded) {
-                    if (sunsetTime >= targetDate && sunsetTime < nextHourDate) {
-                        console.log('ADDING SUNSET: between ' + targetDate.toLocaleString() + ' and ' + nextHourDate.toLocaleString());
+                    var nextForecastDate = (i + 1 < forecastList.length) ? 
+                        new Date(forecastList[i + 1].dt * 1000) : null;
+                    
+                    if (nextForecastDate && sunsetTime >= forecastDate && sunsetTime < nextForecastDate) {
                         var sunsetDiv = createSunsetDiv(sunsetTime);
                         container.appendChild(sunsetDiv);
                         sunsetAdded = true;
+                        console.log('Added sunset box');
+                    } else if (nextForecastDate === null && sunsetTime >= forecastDate) {
+                        // Last forecast, and sunset is after it
+                        var sunsetDiv2 = createSunsetDiv(sunsetTime);
+                        container.appendChild(sunsetDiv2);
+                        sunsetAdded = true;
+                        console.log('Added sunset box at end');
                     }
                 }
+                
+                lastForecastTime = forecastDate;
             }
             
-            // Debug: Check if we missed adding them
+            // Add sunrise/sunset at end if not yet added
             if (sunriseTime && !sunriseAdded) {
-                console.log('WARNING: Sunrise was never added! Time: ' + sunriseTime.toLocaleString());
+                var sunriseDiv2 = createSunriseDiv(sunriseTime);
+                container.appendChild(sunriseDiv2);
+                console.log('Added sunrise box at end');
             }
             if (sunsetTime && !sunsetAdded) {
-                console.log('WARNING: Sunset was never added! Time: ' + sunsetTime.toLocaleString());
+                var sunsetDiv3 = createSunsetDiv(sunsetTime);
+                container.appendChild(sunsetDiv3);
+                console.log('Added sunset box at end');
             }
         }
         
@@ -631,6 +623,7 @@
             var closest = null;
             var closestDiff = Infinity;
             
+            // Find the absolute closest forecast point
             for (var i = 0; i < forecastList.length; i++) {
                 var forecastTime = forecastList[i].dt * 1000;
                 var diff = Math.abs(targetTime - forecastTime);
@@ -728,16 +721,13 @@
             updateDateTime();
             updateWeather();
             
-            // Test single image instead of loading multiple
-            testSingleImage();
+            // No image testing needed
             
             // Update time every second
             setInterval(updateDateTime, 1000);
             
             // Update weather every 30 minutes
             setInterval(updateWeather, 30 * 60 * 1000);
-            
-            // No slideshow for now - just testing one image
         }
 
         // Prevent screen from sleeping (iOS specific)
