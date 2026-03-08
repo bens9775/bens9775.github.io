@@ -1,117 +1,19 @@
-body {
-    margin: 0;
-    padding: 0;
-    background: #50b5d1;
-    color: #000;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
-}
-
-/* Page container */
-#wrapper {
-    width: 760px;
-    margin: 20px auto;
-    border: 2px solid #330;
-    background: #f8ecc2;
-}
-
-/* Main content */
-#content {
-    padding: 30px 40px;
-    text-align: left;
-    line-height: 1.6;
-}
-
-/* Headings */
-
-h1, h2, h3, h4 {
-    text-align: left;
-    margin-top: 0;
-}
-
-h2 {
-    font-size: 30px;
-    margin-bottom: 20px;
-}
-
-h3 {
-    font-size: 20px;
-    margin-top: 30px;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 4px;
-}
-
-h4 {
-    margin-top: 30px;
-    font-size: 16px;
-    font-weight: normal;
-}
-
-/* Image */
-
-img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 0 auto 20px auto;
-}
-
-/* Ingredients */
-
-ul {
-    margin-top: 10px;
-    margin-bottom: 20px;
-    padding-left: 25px;
-}
-
-ul li {
-    margin-bottom: 6px;
-}
-
-/* Steps */
-
-#content p {
-    margin: 10px 0;
-}
-
-/* Footer */
-
-.small {
-    font-size: 11px;
-    color: #333;
-    text-align: center;
-    margin-top: 20px;
-}
-
-/* Links */
-
-a {
-    font-weight: bold;
-    text-decoration: none;
-}
-
-a:link,
-a:visited {
-    color: #2c5ea5;
-}
-
-a:hover {
-    color: #50b5d1;
-    text-decoration: underline;
-}
-
-/* Navigation menu */
+/* Navigation tabs */
 
 #otherstuff {
     margin: 0;
     padding: 0;
+    clear: both;
     list-style: none;
-    display: flex;
+    border-top: 0;
 }
 
 #otherstuff li {
+    width: 125px;
+    float: left;
     background: #2c5ea5;
     border-left: 1px solid white;
+    text-align: center;
 }
 
 #otherstuff li:first-child {
@@ -120,5 +22,5 @@ a:hover {
 
 #otherstuff li a {
     display: block;
-    padding: 6px 14px;
+    padding: 6px 0;
 }
