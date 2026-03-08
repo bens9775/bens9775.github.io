@@ -11,8 +11,8 @@ img {vertical-align: top; margin: 2px 2px 10px 5px; }
 #header {float: none; width: 756px; background: #666; margin: 10px 50px 10px 50px; padding: 0px 0px 0px 0px; text-align: center;}
 
 /*                            the color below     vvv      is for the main text area*/
-#content {float: none; width: auto; background: #f8ecc2; margin: 0px 0px 0px 0px; border: 0px solid #000; line-height: 1.1; text-align: center; padding: 30px 20px 20px 20px; }
-.small {font-size: 11px; color: #333; text-align: left; }
+#content {float: none; width: auto; background: #f8ecc2; margin: 0px 0px 0px 0px; border: 0px solid #000; line-height: 1.1; text-align: left; padding: 30px 20px 20px 20px; }
+.small {font-size: 11px; color: #333; text-align: center; }
 .medium {font-size: 14px; color: #333; text-align: left; }
 
 
