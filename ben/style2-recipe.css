@@ -24,3 +24,59 @@
     display: block;
     padding: 6px 0;
 }
+
+/* improve text readability */
+#content {
+    font-size: 17px;
+    line-height: 1.65;
+}
+
+/* nicer title */
+#content h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+/* section headers like Ingredients / Steps */
+#content h3 {
+    font-size: 20px;
+    margin-top: 28px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #d9cfa5;
+    padding-bottom: 4px;
+}
+
+/* ingredient list */
+#content ul {
+    padding-left: 24px;
+    margin-bottom: 24px;
+}
+
+#content ul li {
+    margin-bottom: 6px;
+}
+
+/* ordered step list (if you convert steps later) */
+#content ol {
+    padding-left: 24px;
+}
+
+#content ol li {
+    margin-bottom: 10px;
+}
+
+/* recipe image */
+#wrapper img {
+    display: block;
+    margin: 0 auto 20px auto;
+    border-radius: 6px;
+}
+
+/* nutrition line */
+#content h4 {
+    margin-top: 30px;
+    font-weight: normal;
+    background: #efe4b5;
+    padding: 10px;
+    border-left: 5px solid #d6c48b;
+}
