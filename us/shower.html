@@ -19,7 +19,40 @@
 <script src="js/nav.js"></script>
    <link rel="stylesheet" href="css/poole.css">
    <link rel="stylesheet" href="css/hyde.css">
+<style>
+	.picture-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
 
+.picture-gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Switch to horizontal scrolling on mobile */
+@media (max-width: 600px) {
+  .picture-gallery {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .picture-gallery img {
+    flex: 0 0 85%;
+    width: 85%;
+    max-width: 400px;
+    scroll-snap-align: start;
+  }
+}
+</style>
 	<title>Baby Shower Pics</title>
 </head>
 <body class="theme-base-10 ">
@@ -44,12 +77,27 @@
 </div>
 </div>
 
-<p>This fall Katie Beth and I are awaiting the birth of our first child. In anticipation of his arrival, my mother and our friend Ashley threw Katie Beth a baby shower. Some of the decorations were so wonderful I decided to post them here for sharing and to remember.</p>
+<p>This fall Katie Beth and I are awaiting the birth of our first child. In anticipation of his arrival, my mother and our friend Ashley threw Katie Beth a baby shower themed after children's books. Some of the decorations were so wonderful I decided to post them here.</p>
+<br>
+<p>A local friend of my mom crafted this delicious vanilla cake, which was decorated with hand-painted fondant books. A true work of art!</p>
+<img src="images/shower/IMG_5524.JPG" alt="" align="middle"><br>
+<img src="images/shower/IMG_5527.JPG" alt="" align="middle"><br>
+<img src="images/shower/IMG_5531.JPG" alt="" align="middle"><br>
+<p>My boy Isaac and I put together this balloon arch based on <i></i>The Very Hungry Caterpillar</i> by Eric Carle. I didn't think we needed to get an electic pump but Isaac got one anyway, which was the right move in retrospect.</p>
+<img src="images/shower/1.jpg" alt="" align="middle"><br>
+<img src="images/shower/2.jpg" alt="" align="middle"><br>
 
-<img src="images/wedding/KatieBethBenWedding-21.jpg" alt="" align="middle"><br>
-<img src="images/wedding/KatieBethBenWedding-28.jpg" alt="" align="middle"><br>
 
+<p>This fall Katie Beth and I are awaiting the birth of our first child. In anticipation of his arrival, my mother and our friend Ashley threw Katie Beth a baby shower themed after children's books. Some of the decorations were so wonderful I decided to post them here.</p>
+<br>
+<p>A local friend of my mom crafted this delicious vanilla cake, which was decorated with hand-painted fondant books. A true work of art!</p>
 
+<div class="picture-gallery">
+<img src="images/shower/IMG_5524.JPG" alt="">
+<img src="images/shower/IMG_5527.JPG" alt="">
+<img src="images/shower/IMG_5531.JPG" alt="">
+</div>
+<p>My boy Isaac and I put together this balloon arch based on <i></i>The Very Hungry Caterpillar</i> by Eric Carle. I didn't think we needed to get an electic pump but Isaac got one anyway, which was the right move in retrospect.</p>
 
 </div>
 
